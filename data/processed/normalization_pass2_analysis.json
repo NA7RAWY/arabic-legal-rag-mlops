@@ -1,0 +1,1725 @@
+{
+  "analysis_type": "normalization_pass_2_dry_run_only",
+  "input_corpus": "data/processed/civil_code_articles_clean_v1.json",
+  "source_pdf": "data/raw/egyptian_civil_code.pdf",
+  "safety": {
+    "corpus_records_inspected": 1149,
+    "input_corpus_sha256_before": "252f316fbe300c76f6aa8a045f419e1dfe020f5faf7bc9954b7a72ac4c14c2bd",
+    "input_corpus_sha256_after": "252f316fbe300c76f6aa8a045f419e1dfe020f5faf7bc9954b7a72ac4c14c2bd",
+    "corpus_hash_unchanged": true,
+    "corpus_text_or_metadata_modified": false,
+    "article_1022_unchanged": true,
+    "article_246_modified": false
+  },
+  "methodology": {
+    "pdf_library": "PyMuPDF",
+    "evidence_used": [
+      "full-page rawdict characters, spans, fonts, and bounding boxes",
+      "article-boundary clips and next-marker coordinates",
+      "rendered source-page/crop inspection",
+      "Arabic sentence context",
+      "parallel English only as supporting evidence"
+    ],
+    "decision_rule": "False negatives are preferred. Automatic eligibility requires consistent occurrence-level evidence; no dictionary-only or generic token-space rule is proposed.",
+    "limitations": "PyMuPDF full-page rawdict exposes only 25 of the 39 corpus PUA occurrences as the same private-use codepoint. The other 14 source contexts were inspected but expose different/normalized coding in full-page extraction. This is reported explicitly rather than hidden."
+  },
+  "private_use_glyphs": {
+    "total_occurrences_in_corpus": 39,
+    "codepoints": {
+      "U+E811": {
+        "occurrence_count": 2,
+        "article_numbers": [
+          785,
+          815
+        ],
+        "contexts": [
+          {
+            "article_number": 785,
+            "source_page": 111,
+            "corpus_context": "لكفيل لمج رد أن الدائن تأخر فى اتخاذ اإلجراءات أو  رد أنه لم يتخذها. (2) على أن ذمة الكفيل تبرأ إذا",
+            "parallel_english_support": "A surety is not discharged merely by reason of the creditor's delay in taking proceedings or of the creditor not taking proceedings. A surety is, however, discharged if the creditor does not take proceedings against the debtor within six mo",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": "لكفيل لمج رد أن الدائن تأخر فى اتخاذ اإلجراءات أو لمج رد أنه لم يتخذها. (2) على أن ذمة الكفيل تبرأ إذا"
+          },
+          {
+            "article_number": 815,
+            "source_page": 115,
+            "corpus_context": "ن سمكه فى ناحيته هو بقدر االستطاعة، ويظل الحائط ا  دد فى غير الجزء المعلى مشتركا، دون أن يكون للجار",
+            "parallel_english_support": "An owner may, if he has good reason to do so, heighten a party wall, provided that he does not thereby cause serious prejudice to his co-owner. He must alone bear the cost of heightening as well as of the maintenance of the part so heighten",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 115,
+                "line_context": " دد فى غير الجزء",
+                "glyph_bbox": [
+                  365.11,
+                  613.977,
+                  365.11,
+                  628.962
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "ن سمكه فى ناحيته هو بقدر االستطاعة، ويظل الحائط ا لمج دد فى غير الجزء المعلى مشتركا، دون أن يكون للجار"
+          }
+        ],
+        "proposed_mapping": "لمج",
+        "confidence": "high",
+        "every_occurrence_supports_same_mapping": true,
+        "exceptions": [],
+        "safe_for_automatic_mapping": true,
+        "source_verification_note": "1 occurrences expose the PUA codepoint in full-page PyMuPDF rawdict spans; remaining corpus occurrences were inspected on their recorded source pages and support the same ligature expansion, but the full-page extraction exposes normalized/different character coding there. This extraction-mode inconsistency is itself consistent with a defective ToUnicode/ligature mapping."
+      },
+      "U+E812": {
+        "occurrence_count": 16,
+        "article_numbers": [
+          98,
+          128,
+          173,
+          212,
+          226,
+          248,
+          296,
+          312,
+          342,
+          365,
+          440,
+          614,
+          647,
+          854,
+          1102,
+          1127
+        ],
+        "contexts": [
+          {
+            "article_number": 98,
+            "source_page": 9,
+            "corpus_context": "كان ه ناك تعامل سابق بين المتعاقدين واتصل اإليجاب  ذا التعامل، أو إذا تمخض اإليجاب لمنفعة من وجه إل",
+            "parallel_english_support": "In the case in which an offeror could not, by reason of the nature of the transaction, in accordance with commercial usage, or on account of other circumstances, have anticipated a formal acceptance, the contract is deemed to have been conc",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": "كان ه ناك تعامل سابق بين المتعاقدين واتصل اإليجاب به ذا التعامل، أو إذا تمخض اإليجاب لمنفعة من وجه إل"
+          },
+          {
+            "article_number": 128,
+            "source_page": 14,
+            "corpus_context": "اقد اآلخر كان يعلم أو كان من المفروض حتما أن يعلم ذا اإلكراه. ا",
+            "parallel_english_support": "When the duress is practiced by a person other than one of the contracting parties, the victim cannot demand the avoidance of the contract, unless it is established that the other contracting party had, or should necessarily have had, knowl",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 14,
+                "line_context": "ذا اإلكراه. ",
+                "glyph_bbox": [
+                  511.3,
+                  199.1,
+                  511.3,
+                  212.54
+                ],
+                "font": "Calibri"
+              }
+            ],
+            "intended_reconstruction": "اقد اآلخر كان يعلم أو كان من المفروض حتما أن يعلم بهذا اإلكراه. ا"
+          },
+          {
+            "article_number": 173,
+            "source_page": 20,
+            "corpus_context": "الرقابة، أو اثبت أن الضرر كان البد واقعا ول و قام  ذا الواجب بما ينبغى من العناية. ا",
+            "parallel_english_support": "A person who is, by law or agreement, entrusted with the supervision of a person who, on account of his minority or his mental or physical condition, requires supervision, is liable for damages for injuries caused to a third party by unlawf",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": "الرقابة، أو اثبت أن الضرر كان البد واقعا ول و قام به ذا الواجب بما ينبغى من العناية. ا"
+          },
+          {
+            "article_number": 212,
+            "source_page": 26,
+            "corpus_context": "لإللتزام. وله أن يطلب من القضاء ترخيصا فى أن يقوم ذه االزالة على نفقة المدين.",
+            "parallel_english_support": "When a debtor infringes an obligation to refrain from doing something the creditor may demand the suppression of that which he has done in contravention of his obligation. The creditor may apply to the court for an order authorizing him to ",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 26,
+                "line_context": "ذه االزالة على نفقة المدين.",
+                "glyph_bbox": [
+                  528.7,
+                  280.61,
+                  528.7,
+                  294.05
+                ],
+                "font": "Calibri"
+              }
+            ],
+            "intended_reconstruction": "لإللتزام. وله أن يطلب من القضاء ترخيصا فى أن يقوم بهذه االزالة على نفقة المدين."
+          },
+          {
+            "article_number": 226,
+            "source_page": 28,
+            "corpus_context": "رية. وتسرى هذه الفوائد من تاريخ المطالبة القضائية  ا أن لم يحدد االتفاق أو العرف التجاري تاريخا آخر",
+            "parallel_english_support": "When the object of an obligation is the payment of a sum of money of which the amount is known at the time when the claim is made, the debtor shall be bound, in case of delay in payment, to pay to the creditor, as damages for the delay, int",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": "رية. وتسرى هذه الفوائد من تاريخ المطالبة القضائية به ا أن لم يحدد االتفاق أو العرف التجاري تاريخا آخر"
+          },
+          {
+            "article_number": 248,
+            "source_page": 31,
+            "corpus_context": " أو محرزه. (2)ومع ذلك يجوز لحابس الشيء إذا هو قام  ذا الطلب خالل الثالثين يوما من الوقت الذي علم في",
+            "parallel_english_support": "The right of retention is extinguished by the fact of the thing ceasing to be in the hands of the possessor or the holder. A person retaining the thing, who has lost possession thereof without his knowledge or in spite of his opposition, ma",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": " أو محرزه. (2)ومع ذلك يجوز لحابس الشيء إذا هو قام به ذا الطلب خالل الثالثين يوما من الوقت الذي علم في"
+          },
+          {
+            "article_number": 296,
+            "source_page": 39,
+            "corpus_context": "إذا صدر حكم على أحد المدينين المتضامنين، فال يحتج  ذا الحكم على الباقين. (2)أما إذا صدر الحكم لصالح",
+            "parallel_english_support": "A judgment given against one of the joint and several debtors will have no effect against the other codebtors. If the judgment is given in favor of one of them, it will benefit the others, unless the judgment is based on a ground relating o",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": "إذا صدر حكم على أحد المدينين المتضامنين، فال يحتج به ذا الحكم على الباقين. (2)أما إذا صدر الحكم لصالح"
+          },
+          {
+            "article_number": 312,
+            "source_page": 41,
+            "corpus_context": " يتمسك قبل المحال له بالدفوع التي كان له أن يتمسك  ا قبل المحيل وقت نفاذ الحوالة في حقه، كما يجوز ل",
+            "parallel_english_support": "A debtor of the right assigned may raise, as against the assignee, the defenses that he was entitled to raise against the assignor at the moment that the assignment became effective against him. He may also raise defenses arising from the c",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": " يتمسك قبل المحال له بالدفوع التي كان له أن يتمسك به ا قبل المحيل وقت نفاذ الحوالة في حقه، كما يجوز ل"
+          },
+          {
+            "article_number": 342,
+            "source_page": 45,
+            "corpus_context": "توفي الجزء المعترف به، فليس للمدين أن يرفض الوفاء ذا الجزء. ا",
+            "parallel_english_support": "In the absence of an agreement or a legal provision to the contrary, the debtor cannot force his creditor to accept a partial payment of his debt. If, in a case where part of the debt is contested, a creditor agrees to receive payment of th",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 45,
+                "line_context": "ذا الجزء.",
+                "glyph_bbox": [
+                  403.63,
+                  726.6,
+                  403.63,
+                  740.04
+                ],
+                "font": "Calibri"
+              }
+            ],
+            "intended_reconstruction": "توفي الجزء المعترف به، فليس للمدين أن يرفض الوفاء بهذا الجزء. ا"
+          },
+          {
+            "article_number": 365,
+            "source_page": 49,
+            "corpus_context": "(1)ال تقع المقاصة إال إذا تمسك  ا من له مصلحة فيها، وال يجوز الترول عنها قبل ثبو",
+            "parallel_english_support": "Compensation only takes place when set up by the interested party. Compensation cannot be renounced before the right thereto has come into existence. Compensation extinguishes the two debts to the extent of the amount of the smaller debt, f",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": "(1)ال تقع المقاصة إال إذا تمسك به ا من له مصلحة فيها، وال يجوز الترول عنها قبل ثبو"
+          },
+          {
+            "article_number": 440,
+            "source_page": 56,
+            "corpus_context": " (إذا رفعت على المشتري دعوى باستحقاق المبيع وأخطر ، ا البائع كان على البائع بحسب األحوال، ووفقا لقا",
+            "parallel_english_support": "When an action for revendication in respect of the thing sold is brought against the purchaser, the vendor, upon receipt of notice of the action, shall, according to the circumstances and in conformity with the provisions of the Code of Pro",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": " (إذا رفعت على المشتري دعوى باستحقاق المبيع وأخطر به، ا البائع كان على البائع بحسب األحوال، ووفقا لقا"
+          },
+          {
+            "article_number": 614,
+            "source_page": 83,
+            "corpus_context": "رى للمباني القائمة وغيرها من ملحقات العين، فيلتزم ا المؤجر ما لم يقض االتفاق أو ا، لعرف بغير ذلك وك",
+            "parallel_english_support": "Subject to an agreement or custom to the contrary, the lessee is bound to carry out repairs necessary for the normal enjoyment of the leased land. He is in particular responsible for the clearing and maintenance of canals, trenches, channel",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 83,
+                "line_context": "ا المؤجر ما لم يقض االتفاق أو ا ، لعرف بغير ذلك",
+                "glyph_bbox": [
+                  478.3,
+                  651.7,
+                  478.3,
+                  665.14
+                ],
+                "font": "Calibri"
+              }
+            ],
+            "intended_reconstruction": "رى للمباني القائمة وغيرها من ملحقات العين، فيلتزم بها المؤجر ما لم يقض االتفاق أو ا، لعرف بغير ذلك وك"
+          },
+          {
+            "article_number": 647,
+            "source_page": 88,
+            "corpus_context": "ى أن يقدم رب العمل المادة التى يستخدمها أو يستعين ا فى القيام بعمله. (2) ًكما يجوز ان يتعهد المقاول",
+            "parallel_english_support": "The contractor may undertake to supply his work only, the master of the work being responsible for the supply of materials which the contractor uses in or for the performance of his work. The contractor may also undertake to supply the mate",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 88,
+                "line_context": "ا فى القيام بعمله .",
+                "glyph_bbox": [
+                  424.87,
+                  229.46,
+                  424.87,
+                  242.9
+                ],
+                "font": "Calibri"
+              }
+            ],
+            "intended_reconstruction": "ى أن يقدم رب العمل المادة التى يستخدمها أو يستعين بها فى القيام بعمله. (2) ًكما يجوز ان يتعهد المقاول"
+          },
+          {
+            "article_number": 854,
+            "source_page": 122,
+            "corpus_context": "لى غير ذلك. (2)ويجوز عزل المدير بالطريقة التى عين ، ا ولو أتفق على غير ذلك كما يجوز للمحكمة أن تعزل",
+            "parallel_english_support": "Co-owners who own the majority in value of the shares, may appoint amongst themselves one or more managers. Subject to any agreement to the contrary, the manager may introduce such changes in the intended use of the property held in common ",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": "لى غير ذلك. (2)ويجوز عزل المدير بالطريقة التى عين به، ا ولو أتفق على غير ذلك كما يجوز للمحكمة أن تعزل"
+          },
+          {
+            "article_number": 1102,
+            "source_page": 161,
+            "corpus_context": "الرهن الحيازى أحكام المادتين ٨٤٠١ و ٩٤٠١ المتعلقة  الك الشيء المرهون رهنا رسميا أو تلفه، وبانتقال ح",
+            "parallel_english_support": "A pledgor guarantees the thing pledged against loss or deterioration when such loss or deterioration is due either to his negligence or to force majeure. The provisions of Articles 1048 and 1049, relating to the loss or deterioration of a m",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 161,
+                "line_context": " الك الشيء المرهون رهنا رسميا أو تلفه ، وبانتقال حق الدائن من الشيء",
+                "glyph_bbox": [
+                  553.9,
+                  578.577,
+                  553.9,
+                  593.562
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "الرهن الحيازى أحكام المادتين ٨٤٠١ و ٩٤٠١ المتعلقة به الك الشيء المرهون رهنا رسميا أو تلفه، وبانتقال ح"
+          },
+          {
+            "article_number": 1127,
+            "source_page": 165,
+            "corpus_context": "قدر الذى يجوز فيه للمدين فى حالة الحوالة أن يتمسك ذه الدفوع قبل المحال إليه. ا",
+            "parallel_english_support": "The debtor of a debt given in pledge may set up against the pledgee the defenses relative to the validity of the debt secured by the pledge as well as those defenses he may have against his own creditor, to the extent that an assigned debto",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 165,
+                "line_context": "ذه الدفوع قبل المحال إليه .",
+                "glyph_bbox": [
+                  520.66,
+                  779.28,
+                  520.66,
+                  792.72
+                ],
+                "font": "Calibri"
+              }
+            ],
+            "intended_reconstruction": "قدر الذى يجوز فيه للمدين فى حالة الحوالة أن يتمسك بهذه الدفوع قبل المحال إليه. ا"
+          }
+        ],
+        "proposed_mapping": "به",
+        "confidence": "high",
+        "every_occurrence_supports_same_mapping": true,
+        "exceptions": [],
+        "safe_for_automatic_mapping": true,
+        "source_verification_note": "7 occurrences expose the PUA codepoint in full-page PyMuPDF rawdict spans; remaining corpus occurrences were inspected on their recorded source pages and support the same ligature expansion, but the full-page extraction exposes normalized/different character coding there. This extraction-mode inconsistency is itself consistent with a defective ToUnicode/ligature mapping."
+      },
+      "U+E814": {
+        "occurrence_count": 15,
+        "article_numbers": [
+          615,
+          651,
+          829,
+          906,
+          1039,
+          1045,
+          1056,
+          1072,
+          1077,
+          1100,
+          1101,
+          1106,
+          1110,
+          1118,
+          1126
+        ],
+        "contexts": [
+          {
+            "article_number": 615,
+            "source_page": 83,
+            "corpus_context": "ما دة ٥١٦ إذا منع المستأجر من  يئة األرض للزراعة أو من بذرها أو هلك البذر كله أ",
+            "parallel_english_support": "If the lease has, as a result of force majeure, been prevented from preparing or sowing the land, or if the whole or the greater part of the seed has been destroyed thereby, he is, subject to any agreement to the contrary and as the case ma",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": "ما دة ٥١٦ إذا منع المستأجر من ته يئة األرض للزراعة أو من بذرها أو هلك البذر كله أ"
+          },
+          {
+            "article_number": 651,
+            "source_page": 88,
+            "corpus_context": "عماري والمقاول متضامنين ما يحدث خالل عشر سنوات من  دم كلى أو جزئي فيما شيدوه من مبان أو أقاموه من م",
+            "parallel_english_support": "The architect and contractor are jointly and severally responsible for a period of ten years for the total or partial demolition of constructions or other permanent works erected by them, even if such destruction is due to a defect in the g",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": "عماري والمقاول متضامنين ما يحدث خالل عشر سنوات من ته دم كلى أو جزئي فيما شيدوه من مبان أو أقاموه من م"
+          },
+          {
+            "article_number": 829,
+            "source_page": 117,
+            "corpus_context": "خرج عن حدود اإلدارة المعتادة، على أن يعلنوا قرارا  م إلى باقي الشركاء. ولمن خالف من هؤالء حق الرجوع",
+            "parallel_english_support": "Co-owners who possess at least three quarters of the property held in common may decide, with a view to obtaining greater enjoyment of the property, to make essential modifications or changes, in the use for which the property was intended,",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 117,
+                "line_context": " م إلى باقي الشركاء . ولمن خالف من هؤالء حق الرجوع إلى",
+                "glyph_bbox": [
+                  535.54,
+                  750.557,
+                  535.54,
+                  765.542
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "خرج عن حدود اإلدارة المعتادة، على أن يعلنوا قرارا ته م إلى باقي الشركاء. ولمن خالف من هؤالء حق الرجوع"
+          },
+          {
+            "article_number": 906,
+            "source_page": 130,
+            "corpus_context": " صناعي أو تجارى مما يعتبر وحدة اقتصادية قائمة بذا  ا، وجب تخصيصه برمته لمن يطلبه من الورثة إذا كان ",
+            "parallel_english_support": "If there is, amongst the property of an estate, an agricultural, industrial or commercial enterprise constituting a distinct economic unity, it must be allotted as a whole to such one of the heirs who applies for it if he is the most capabl",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 130,
+                "line_context": " ا ، وجب تخصيصه برمته لمن يطلبه من الورثة",
+                "glyph_bbox": [
+                  470.5,
+                  535.467,
+                  470.5,
+                  550.452
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": " صناعي أو تجارى مما يعتبر وحدة اقتصادية قائمة بذا ته ا، وجب تخصيصه برمته لمن يطلبه من الورثة إذا كان "
+          },
+          {
+            "article_number": 1039,
+            "source_page": 150,
+            "corpus_context": "يعين هذا القدر بأمر على عريضة. ويقوم ال دائن المر  ن بإجراء قيد جديد يبين فيه القدر الذى انتقل إليه",
+            "parallel_english_support": "A mortgage granted by all the co-owners of an immovable held in common remains effective whatever may be the ultimate result of a partition of the immovable or if its sale by auction owing to impossibility of partition. If one of the owners",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 150,
+                "line_context": " ن بإجراء قيد جديد يبين فيه القدر الذى انتقل إليه الرهن خالل تسعين",
+                "glyph_bbox": [
+                  539.62,
+                  680.937,
+                  539.62,
+                  695.922
+                ],
+                "font": "ArialMT"
+              },
+              {
+                "page": 151,
+                "line_context": " ن إال إذا كان",
+                "glyph_bbox": [
+                  349.15,
+                  591.537,
+                  349.15,
+                  606.522
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "يعين هذا القدر بأمر على عريضة. ويقوم ال دائن المر ته ن بإجراء قيد جديد يبين فيه القدر الذى انتقل إليه"
+          },
+          {
+            "article_number": 1045,
+            "source_page": 151,
+            "corpus_context": "إليجار الصادر من الراهن ال ينفذ فى حق الدائن المر  ن إال إذا كان ثابت التاريخ قبل تسجيل تنبيه نزع ا",
+            "parallel_english_support": "A lease entered into by a mortgagor cannot have effect against a mortgagee unless such lease has been given an established date before the transcription of the formal summons to pay. A lease that has not an established date before this tran",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 150,
+                "line_context": " ن بإجراء قيد جديد يبين فيه القدر الذى انتقل إليه الرهن خالل تسعين",
+                "glyph_bbox": [
+                  539.62,
+                  680.937,
+                  539.62,
+                  695.922
+                ],
+                "font": "ArialMT"
+              },
+              {
+                "page": 151,
+                "line_context": " ن إال إذا كان",
+                "glyph_bbox": [
+                  349.15,
+                  591.537,
+                  349.15,
+                  606.522
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "إليجار الصادر من الراهن ال ينفذ فى حق الدائن المر ته ن إال إذا كان ثابت التاريخ قبل تسجيل تنبيه نزع ا"
+          },
+          {
+            "article_number": 1056,
+            "source_page": 153,
+            "corpus_context": "يستوفى الدائنون المر  نون حقوقهم قبل الدائنين العاديين من ثمن العقار ا",
+            "parallel_english_support": "Mortgagees will be paid before unsecured creditors out of the proceeds of sale of the mortgaged property, or out of any monies obtained in substitution thereof, in the order of the rank of their inscriptions, even when their inscriptions ar",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 153,
+                "line_context": " نون حقوقهم قبل الدائنين العاديين من ثمن العقار",
+                "glyph_bbox": [
+                  478.3,
+                  617.817,
+                  478.3,
+                  632.802
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "يستوفى الدائنون المر ته نون حقوقهم قبل الدائنين العاديين من ثمن العقار ا"
+          },
+          {
+            "article_number": 1072,
+            "source_page": 157,
+            "corpus_context": "لرهن أو يتخلى عن هذا العقار، فال يجوز للدائن المر  ن أن يتخذ فى مواجهته إجراءات نزع الملكية وفقا أل",
+            "parallel_english_support": "If the third party holder does not opt for payment of the inscribed debts, the purge of the property or the abandonment of the property, the mortgagee can only take expropriation procedures against him, in accordance with the provisions of ",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 157,
+                "line_context": " ن أن يتخذ فى مواجهته",
+                "glyph_bbox": [
+                  388.63,
+                  143.977,
+                  388.63,
+                  158.962
+                ],
+                "font": "ArialMT"
+              },
+              {
+                "page": 157,
+                "line_context": " نين أن يطلبوا من الحائز أن",
+                "glyph_bbox": [
+                  406.03,
+                  656.817,
+                  406.03,
+                  671.802
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "لرهن أو يتخلى عن هذا العقار، فال يجوز للدائن المر ته ن أن يتخذ فى مواجهته إجراءات نزع الملكية وفقا أل"
+          },
+          {
+            "article_number": 1077,
+            "source_page": 157,
+            "corpus_context": "دة حقوقهم، كانت الزيادة للحائز وكان للدائنين المر  نين أن يطلبوا من الحائز أن يستوفوا حقوقهم من هذه",
+            "parallel_english_support": "If the price at which the property sold by auction exceeds the total of the sums due to the inscribed creditors, the difference in excess belongs to the third party holder; and the mortgagee creditors of the third party holder may be paid o",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 157,
+                "line_context": " ن أن يتخذ فى مواجهته",
+                "glyph_bbox": [
+                  388.63,
+                  143.977,
+                  388.63,
+                  158.962
+                ],
+                "font": "ArialMT"
+              },
+              {
+                "page": 157,
+                "line_context": " نين أن يطلبوا من الحائز أن",
+                "glyph_bbox": [
+                  406.03,
+                  656.817,
+                  406.03,
+                  671.802
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "دة حقوقهم، كانت الزيادة للحائز وكان للدائنين المر ته نين أن يطلبوا من الحائز أن يستوفوا حقوقهم من هذه"
+          },
+          {
+            "article_number": 1100,
+            "source_page": 161,
+            "corpus_context": "يازة الراهن انقضى الرهن، إال إذا أثبت الدائن المر  ن أن الرجوع كان بسبب ال يقصد بهانقضاء الرهن. كل ",
+            "parallel_english_support": "The pledge is extinguished if the thing pledged returns into the hands of the pledgor, unless the pledgee proves that return took place for a reason that was not intended to extinguish the pledge, subject always to the rights of third parti",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 161,
+                "line_context": " ن أن الرجوع كان بسبب ال يقصد به انقضاء الرهن . كل هذا دون",
+                "glyph_bbox": [
+                  539.62,
+                  348.487,
+                  539.62,
+                  363.472
+                ],
+                "font": "ArialMT"
+              },
+              {
+                "page": 161,
+                "line_context": " ن فى حالة االستعجال أن يتخذ على نفقة الراهن كل",
+                "glyph_bbox": [
+                  485.38,
+                  442.227,
+                  485.38,
+                  457.212
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "يازة الراهن انقضى الرهن، إال إذا أثبت الدائن المر ته ن أن الرجوع كان بسبب ال يقصد بهانقضاء الرهن. كل "
+          },
+          {
+            "article_number": 1101,
+            "source_page": 161,
+            "corpus_context": "مال الدائن لحقوقه المستمدة من العقد، وللدائن المر  ن فى حالة االستعجال أن يتخذ على نفقة الراهن كل ا",
+            "parallel_english_support": "The pledgor guarantees the pledge and its efficacy. He must not do anything which diminishes the value of the thing pledged or prevents the creditor exercising his rights derived from the contract. The pledgee may, in case of urgency, take ",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 161,
+                "line_context": " ن أن الرجوع كان بسبب ال يقصد به انقضاء الرهن . كل هذا دون",
+                "glyph_bbox": [
+                  539.62,
+                  348.487,
+                  539.62,
+                  363.472
+                ],
+                "font": "ArialMT"
+              },
+              {
+                "page": 161,
+                "line_context": " ن فى حالة االستعجال أن يتخذ على نفقة الراهن كل",
+                "glyph_bbox": [
+                  485.38,
+                  442.227,
+                  485.38,
+                  457.212
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "مال الدائن لحقوقه المستمدة من العقد، وللدائن المر ته ن فى حالة االستعجال أن يتخذ على نفقة الراهن كل ا"
+          },
+          {
+            "article_number": 1106,
+            "source_page": 162,
+            "corpus_context": "١ (يتولى الدائن المر  ن إدارة الشيء المرهون، وعليه أن يبذل فى ذلك من ا",
+            "parallel_english_support": "The pledgee shall manage the thing pledged and shall use in such management the care expected from a reasonable person. He may not, without the consent of the pledgor, change the method of exploitation of the thing pledged and is bound to a",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 161,
+                "line_context": " ن أن الرجوع كان بسبب ال يقصد به انقضاء الرهن . كل هذا دون",
+                "glyph_bbox": [
+                  539.62,
+                  348.487,
+                  539.62,
+                  363.472
+                ],
+                "font": "ArialMT"
+              },
+              {
+                "page": 161,
+                "line_context": " ن فى حالة االستعجال أن يتخذ على نفقة الراهن كل",
+                "glyph_bbox": [
+                  485.38,
+                  442.227,
+                  485.38,
+                  457.212
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "١ (يتولى الدائن المر ته ن إدارة الشيء المرهون، وعليه أن يبذل فى ذلك من ا"
+          },
+          {
+            "article_number": 1110,
+            "source_page": 162,
+            "corpus_context": "(1)يخول الرهن الدائن المر  ن الحق فى حبس الشيء المرهون عن الناس كافة، دون إ",
+            "parallel_english_support": "Pledge confers upon the pledgee the right to retain the thing pledged against any other person, subject to the rights of third parties which have been preserved in accordance with the law. If the pledgee loses possession of the thing unknow",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 161,
+                "line_context": " ن أن الرجوع كان بسبب ال يقصد به انقضاء الرهن . كل هذا دون",
+                "glyph_bbox": [
+                  539.62,
+                  348.487,
+                  539.62,
+                  363.472
+                ],
+                "font": "ArialMT"
+              },
+              {
+                "page": 161,
+                "line_context": " ن فى حالة االستعجال أن يتخذ على نفقة الراهن كل",
+                "glyph_bbox": [
+                  485.38,
+                  442.227,
+                  485.38,
+                  457.212
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "(1)يخول الرهن الدائن المر ته ن الحق فى حبس الشيء المرهون عن الناس كافة، دون إ"
+          },
+          {
+            "article_number": 1118,
+            "source_page": 164,
+            "corpus_context": "ملها تسرى على رهن المنقول. (2)ويوجه خاص يكون للمر  ن إذا كان حسن النية أن يتمسك بحقه فى الرهن ولو ك",
+            "parallel_english_support": "The rules relating to the effects of possession of material movables and of bearer securities apply to the pledge of a movable. A pledgee in good faith may, in particular, avail himself of his right of pledge even if the pledgor was not qua",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 163,
+                "line_context": " ن الحق فى حبس الشيء المرهون عن الناس",
+                "glyph_bbox": [
+                  456.46,
+                  37.637,
+                  456.46,
+                  52.622
+                ],
+                "font": "ArialMT"
+              },
+              {
+                "page": 164,
+                "line_context": " ن إذا كان حسن النية أن يتمسك بحقه فى",
+                "glyph_bbox": [
+                  448.9,
+                  455.187,
+                  448.9,
+                  470.172
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "ملها تسرى على رهن المنقول. (2)ويوجه خاص يكون للمر ته ن إذا كان حسن النية أن يتمسك بحقه فى الرهن ولو ك"
+          },
+          {
+            "article_number": 1126,
+            "source_page": 165,
+            "corpus_context": "(1)للدائن المر  ن أن يستولي على الفوائد المستحقة عن الدين المرهو",
+            "parallel_english_support": "In the absence of an agreement to the contrary, the pledgor has the right to collect the interest on the pledged debt which falls due after the constitution of the pledge. He has also the right to collect periodical payments appertaining to",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 164,
+                "line_context": " ن إذا كان حسن النية أن يتمسك بحقه فى",
+                "glyph_bbox": [
+                  448.9,
+                  455.187,
+                  448.9,
+                  470.172
+                ],
+                "font": "ArialMT"
+              },
+              {
+                "page": 165,
+                "line_context": " ن أن يستولي على الفوائد المستحقة عن الدين المرهون",
+                "glyph_bbox": [
+                  500.02,
+                  523.827,
+                  500.02,
+                  538.812
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "(1)للدائن المر ته ن أن يستولي على الفوائد المستحقة عن الدين المرهو"
+          }
+        ],
+        "proposed_mapping": "ته",
+        "confidence": "high",
+        "every_occurrence_supports_same_mapping": true,
+        "exceptions": [],
+        "safe_for_automatic_mapping": true,
+        "source_verification_note": "13 occurrences expose the PUA codepoint in full-page PyMuPDF rawdict spans; remaining corpus occurrences were inspected on their recorded source pages and support the same ligature expansion, but the full-page extraction exposes normalized/different character coding there. This extraction-mode inconsistency is itself consistent with a defective ToUnicode/ligature mapping."
+      },
+      "U+E815": {
+        "occurrence_count": 6,
+        "article_numbers": [
+          177,
+          340,
+          523,
+          724,
+          856,
+          1145
+        ],
+        "contexts": [
+          {
+            "article_number": 177,
+            "source_page": 21,
+            "corpus_context": " مسئول عما يحدث ا نه دام البناء من ضرر، ولو كان ا  داما جزئيا، ما لم يثبت أن الحادث ال يرجع س ببه إ",
+            "parallel_english_support": "A person in charge of a building, even if he is not its owner, is liable for damage caused by the collapse of the building, even if such collapse is partial, unless he shows that the accident did not occur as a result of negligent maintenan",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": " مسئول عما يحدث ا نه دام البناء من ضرر، ولو كان ا نه داما جزئيا، ما لم يثبت أن الحادث ال يرجع س ببه إ"
+          },
+          {
+            "article_number": 340,
+            "source_page": 45,
+            "corpus_context": "العرض مادام الدائن لم يقبله، أو مادام لم يصدر حكم ائي بصحته وإذا رجع فال تبرأ ذمة شركائه في الدين و",
+            "parallel_english_support": "A debtor who has made a tender of the debt followed by a deposit, or by an equivalent measure, may retract his tender as long as it has not been accepted by the creditor, or as long as it has not been recognized as valid by a final judgment",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 45,
+                "line_context": "ائي بصحته وإذا رجع فال تبرأ ذمة شركائه في الدين والذمة الضامنين. ",
+                "glyph_bbox": [
+                  553.9,
+                  443.11,
+                  553.9,
+                  456.55
+                ],
+                "font": "Calibri"
+              }
+            ],
+            "intended_reconstruction": "العرض مادام الدائن لم يقبله، أو مادام لم يصدر حكم نهائي بصحته وإذا رجع فال تبرأ ذمة شركائه في الدين و"
+          },
+          {
+            "article_number": 523,
+            "source_page": 69,
+            "corpus_context": "(1)إذا لم تف أموال الشركة بديو  ا، كان الشركاء مسئولين عن هذه الديون في أموالهم ",
+            "parallel_english_support": "If the assets of the partnership does not cover its debts, the partners shall, in the absence of an agreement providing for another division, be liable for these debts from their own property, each in proportion to his share in the losses o",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 69,
+                "line_context": " ا ، كان الشركاء مسئولين عن هذه",
+                "glyph_bbox": [
+                  429.79,
+                  171.697,
+                  429.79,
+                  186.682
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "(1)إذا لم تف أموال الشركة بديو نه ا، كان الشركاء مسئولين عن هذه الديون في أموالهم "
+          },
+          {
+            "article_number": 724,
+            "source_page": 102,
+            "corpus_context": " أجر، فإذا أتفق على أجر وجب على المودع أن يؤديه إ  اء الوديعة، ما لم يوجد اتفاق يقضى بغير ذلك. ا",
+            "parallel_english_support": "A deposit is deemed gratuitous. When, however, remuneration is stipulated, the depositor, in the absence of agreement to the contrary, is bound to pay such remuneration at the time the deposit ends.",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 102,
+                "line_context": " اء",
+                "glyph_bbox": [
+                  493.06,
+                  441.507,
+                  493.06,
+                  456.492
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": " أجر، فإذا أتفق على أجر وجب على المودع أن يؤديه إ نه اء الوديعة، ما لم يوجد اتفاق يقضى بغير ذلك. ا"
+          },
+          {
+            "article_number": 856,
+            "source_page": 122,
+            "corpus_context": "١ (إذا تعدد مالك طبقات الدار أو شققها المختلفة فأ  م يعدون شركاء فى، ملكي األرض وملكية أجزاء البناء",
+            "parallel_english_support": "In the absence of any provisions to the contrary in the title deeds, when the different storeys or various apartments of a building belong to different owners, such owners are considered co-owners of the ground and of the parts of the build",
+            "full_page_rawdict_glyph_located": true,
+            "pdf_span_evidence": [
+              {
+                "page": 122,
+                "line_context": " م يعدون شركاء فى",
+                "glyph_bbox": [
+                  371.47,
+                  428.787,
+                  371.47,
+                  443.772
+                ],
+                "font": "ArialMT"
+              }
+            ],
+            "intended_reconstruction": "١ (إذا تعدد مالك طبقات الدار أو شققها المختلفة فأ نه م يعدون شركاء فى، ملكي األرض وملكية أجزاء البناء"
+          },
+          {
+            "article_number": 1145,
+            "source_page": 169,
+            "corpus_context": " إال أنه يسرى فى حق المؤجر وصاحب الفندق إذا ثبت أ  ما كانا يعلمان به وقت وضع المبيع فى العين المؤجر",
+            "parallel_english_support": "Sums due to a vendor of a movable for price and accessories are secured by a privilege over the movable sold. This privilege is enforceable as long as the movable sold preserves its identity, subject to the rights acquired in good faith by ",
+            "full_page_rawdict_glyph_located": false,
+            "pdf_span_evidence": [],
+            "intended_reconstruction": " إال أنه يسرى فى حق المؤجر وصاحب الفندق إذا ثبت أ نه ما كانا يعلمان به وقت وضع المبيع فى العين المؤجر"
+          }
+        ],
+        "proposed_mapping": "نه",
+        "confidence": "high",
+        "every_occurrence_supports_same_mapping": true,
+        "exceptions": [],
+        "safe_for_automatic_mapping": true,
+        "source_verification_note": "4 occurrences expose the PUA codepoint in full-page PyMuPDF rawdict spans; remaining corpus occurrences were inspected on their recorded source pages and support the same ligature expansion, but the full-page extraction exposes normalized/different character coding there. This extraction-mode inconsistency is itself consistent with a defective ToUnicode/ligature mapping."
+      }
+    },
+    "root_cause": "The PDF uses embedded-font Arabic ligatures with defective/inconsistent Unicode mapping. Depending on extraction context, the same visual ligature is emitted as a Private Use Area codepoint or normalized/different character sequence.",
+    "safe_mapping_count": 4,
+    "proposed_global_map": {
+      "U+E811": "لمج",
+      "U+E812": "به",
+      "U+E814": "ته",
+      "U+E815": "نه"
+    }
+  },
+  "isolated_trailing_arabic_characters": {
+    "total_occurrences": 755,
+    "character_counts": {
+      "ا": 754,
+      "ل": 1
+    },
+    "root_cause_hypothesis": "The English article-marker y-coordinate is used as the extraction end boundary. On the Arabic column, the next marker line begins about 1.83 points above that boundary and extends about 10.48 points below it. The clip therefore intersects the next Arabic marker; subsequent extraction/cleanup leaves an isolated fragment. For Article 1122, the lone ل is associated with the intervening Arabic heading/marker layout rather than the legal sentence.",
+    "evidence": {
+      "occurrences_with_next_arabic_مادة_marker_within_20_points": 755,
+      "same_page_boundaries": 632,
+      "page_crossing_boundaries": 123,
+      "hierarchy_transition_boundaries": 1,
+      "dominant_marker_delta_y0_points": -1.831,
+      "dominant_marker_delta_y1_points": 10.478,
+      "representative_samples": [
+        {
+          "article_number": 6,
+          "trailing_character": "ا",
+          "next_article": 7,
+          "next_marker_page": 2,
+          "same_page_as_article_source": false,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 106.34,
+          "nearby_arabic_marker_text": " ( مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 186,
+          "trailing_character": "ا",
+          "next_article": 187,
+          "next_marker_page": 22,
+          "same_page_as_article_source": true,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 781.8,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 282,
+          "trailing_character": "ا",
+          "next_article": 283,
+          "next_marker_page": 37,
+          "same_page_as_article_source": true,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 512.23,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 368,
+          "trailing_character": "ا",
+          "next_article": 369,
+          "next_marker_page": 50,
+          "same_page_as_article_source": true,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 214.22,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 488,
+          "trailing_character": "ا",
+          "next_article": 489,
+          "next_marker_page": 63,
+          "same_page_as_article_source": true,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 675.34,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 582,
+          "trailing_character": "ا",
+          "next_article": 583,
+          "next_marker_page": 78,
+          "same_page_as_article_source": true,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 700.18,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 685,
+          "trailing_character": "ا",
+          "next_article": 686,
+          "next_marker_page": 96,
+          "same_page_as_article_source": false,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 66.0,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 777,
+          "trailing_character": "ا",
+          "next_article": 778,
+          "next_marker_page": 110,
+          "same_page_as_article_source": true,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 459.43,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 867,
+          "trailing_character": "ا",
+          "next_article": 868,
+          "next_marker_page": 124,
+          "same_page_as_article_source": true,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 618.1,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 959,
+          "trailing_character": "ا",
+          "next_article": 960,
+          "next_marker_page": 138,
+          "same_page_as_article_source": true,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 713.62,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 1054,
+          "trailing_character": "ا",
+          "next_article": 1055,
+          "next_marker_page": 153,
+          "same_page_as_article_source": true,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 538.03,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 1148,
+          "trailing_character": "ا",
+          "next_article": 1149,
+          "next_marker_page": 170,
+          "same_page_as_article_source": true,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 309.29,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 104,
+          "trailing_character": "ا",
+          "next_article": 105,
+          "next_marker_page": 11,
+          "same_page_as_article_source": false,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 52.56,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 112,
+          "trailing_character": "ا",
+          "next_article": 113,
+          "next_marker_page": 12,
+          "same_page_as_article_source": false,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 66.0,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 120,
+          "trailing_character": "ا",
+          "next_article": 121,
+          "next_marker_page": 13,
+          "same_page_as_article_source": false,
+          "hierarchy_transition_before_next_article": false,
+          "english_marker_y": 106.34,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        },
+        {
+          "article_number": 1122,
+          "trailing_character": "ل",
+          "next_article": 1123,
+          "next_marker_page": 165,
+          "same_page_as_article_source": true,
+          "hierarchy_transition_before_next_article": true,
+          "english_marker_y": 268.97,
+          "nearby_arabic_marker_text": " مادة",
+          "arabic_marker_y0_minus_boundary": -1.831,
+          "arabic_marker_y1_minus_boundary": 10.478
+        }
+      ]
+    },
+    "classification": "B: leaked glyphs from the next article marker/header layout",
+    "safe_to_automate": true,
+    "safe_rule_scope": "For the 754 trailing ا cases only: remove the suffix only when the record ends with sentence-final punctuation plus isolated ا AND PDF geometry confirms that the next Arabic مادة marker intersects the English-marker clip boundary in the observed position. Do not use a text-only global suffix rule.",
+    "exception": {
+      "article_number": 1122,
+      "trailing_character": "ل",
+      "safe_to_automate": false,
+      "recommendation": "manual review; do not include in the ا rule"
+    }
+  },
+  "split_arabic_words": {
+    "candidate_occurrences_inspected": 39,
+    "safe_join_occurrence_count": 14,
+    "safe_pattern_count": 7,
+    "safe_join_candidates": [
+      {
+        "candidate": "قان ون",
+        "article_number": 21,
+        "corpus_context": "(1)يسري علي االلتزامات غير التعاقدية قان ون البلد الذي وقع فيه الفعل المنشئ لاللتزام. (",
+        "pdf_geometry": [
+          {
+            "page": 4,
+            "visual_gap_points": 0.121,
+            "median_line_space_points": 3.069,
+            "line_context": "(١ (يسري علي االلتزامات غير التعاقدية قان ون البلد الذي وقع فيه الفعل"
+          }
+        ],
+        "proposed_join": "قانون",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "ع لى",
+        "article_number": 323,
+        "corpus_context": "الوفاء، ولو كان ذلك دون علم المدين أو رغم إرادته، ع لى أنه يجوز للدائن أن يرفض الوفاء من الغير إذا ا",
+        "pdf_geometry": [
+          {
+            "page": 42,
+            "visual_gap_points": 0.062,
+            "median_line_space_points": 3.069,
+            "line_context": "الوفاء ، ولو كان ذلك دون علم المدين أو رغم إرادته ، ع لى أنه يجوز"
+          }
+        ],
+        "proposed_join": "على",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "ع لى",
+        "article_number": 514,
+        "corpus_context": " ذلك بنسبة حصته في رأس المال. (2)فإذا اقتصر العقد ع لى تعيين نصيب الشركاء في الربح وجب اعتبار هذا ال",
+        "pdf_geometry": [
+          {
+            "page": 67,
+            "visual_gap_points": 0.164,
+            "median_line_space_points": 3.069,
+            "line_context": "(٢ (فإذا اقتصر العقد ع لى تعيين نصيب الشركاء في الربح وجب اعتبار"
+          }
+        ],
+        "proposed_join": "على",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "ع لى",
+        "article_number": 756,
+        "corpus_context": " المريض إرادته، بقى التزام المؤمن قائماً بأكمله. وع لى المؤمن أن يثبت أن المؤمن على حياته مات منتحرا",
+        "pdf_geometry": [
+          {
+            "page": 107,
+            "visual_gap_points": 0.103,
+            "median_line_space_points": 3.069,
+            "line_context": "المؤمن قائماً بأكمله . وع لى المؤمن أن يثبت أن المؤمن على حياته مات"
+          }
+        ],
+        "proposed_join": "على",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "عل ى",
+        "article_number": 94,
+        "corpus_context": "عقد، ولو لم يصدر القبول فوراً، إذا لم يوجد ما يدل عل ى أن الموجب قد عدل عن ايجابه في الفترة ما بين ا",
+        "pdf_geometry": [
+          {
+            "page": 9,
+            "visual_gap_points": -0.132,
+            "median_line_space_points": 3.069,
+            "line_context": "(٢ (ومع ذلك يتم العقد، ولو لم يصدر القبول فوراً، إذا لم يوجد ما يدل عل ى"
+          }
+        ],
+        "proposed_join": "على",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "عل ى",
+        "article_number": 227,
+        "corpus_context": "ة أخرى تشترط فيها الفوائد، على أال يزيد هذا السعر عل ى سبعة في المائة فإذا اتفقا على هذا السعر وجب ت",
+        "pdf_geometry": [
+          {
+            "page": 28,
+            "visual_gap_points": 0.187,
+            "median_line_space_points": 3.069,
+            "line_context": "هذا السعر عل ى سبعة في المائة فإذا اتفقا على هذا السعر وجب تخفيضها"
+          }
+        ],
+        "proposed_join": "على",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 363,
+        "corpus_context": "كان الوفاء في الدينين ولكن يجب عليه في هذه الحالة أ ن يعوض الدائن عما لحقه من ضرر لعدم تمكنه بسبب ال",
+        "pdf_geometry": [
+          {
+            "page": 49,
+            "visual_gap_points": 0.137,
+            "median_line_space_points": 3.069,
+            "line_context": "يجب عليه في هذه الحالة أ ن يعوض الدائن عما لحقه من ضرر لعدم تمكنه"
+          }
+        ],
+        "proposed_join": "أن",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 517,
+        "corpus_context": "ركاء المنتدبين أن يعترض على العمل قبل تمامه، وعلي أ ن يكون من حق أغلبية الشركاء المنتدبين رفض هذا اا",
+        "pdf_geometry": [
+          {
+            "page": 68,
+            "visual_gap_points": -0.127,
+            "median_line_space_points": 3.069,
+            "line_context": "الشركاء المنتدبين أن يعترض على العمل قبل تمامه ، وعلي أ ن يكون من"
+          }
+        ],
+        "proposed_join": "أن",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 799,
+        "corpus_context": "إذا وفى الكفيل الدين، كان له أ ن يحل محل الدائن فى جميع ماله من حقوق قبل المدين",
+        "pdf_geometry": [
+          {
+            "page": 113,
+            "visual_gap_points": -0.02,
+            "median_line_space_points": 3.069,
+            "line_context": "إذا وفى الكفيل الدين ، كان له أ ن يحل محل الدائن فى جميع ماله من حقوق"
+          }
+        ],
+        "proposed_join": "أن",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "أ و",
+        "article_number": 322,
+        "corpus_context": " تعين على الدائن متى أعلن رسميا بالحوالة أن يقرها أ و رفضها في ميعاد ال يجاوز ستة أشهر، فإذا انقضي ه",
+        "pdf_geometry": [
+          {
+            "page": 42,
+            "visual_gap_points": 0.091,
+            "median_line_space_points": 3.069,
+            "line_context": "على الدائن متى أعلن رسميا بالحوالة أن يقرها أ و رفضها في ميعاد ال"
+          }
+        ],
+        "proposed_join": "أو",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "أ و",
+        "article_number": 888,
+        "corpus_context": "يستعين فى الجرد وفى تقدير قيمة أموال التركة بخبير أ و بمن يكون له فى ذلك دراية خاصة. (2) ويجب على ال",
+        "pdf_geometry": [
+          {
+            "page": 128,
+            "visual_gap_points": -0.209,
+            "median_line_space_points": 3.069,
+            "line_context": ")١ (للمصفى أن يستعين فى الجرد وفى تقدير قيمة أموال التركة بخبير أ و"
+          }
+        ],
+        "proposed_join": "أو",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "إ ذا",
+        "article_number": 444,
+        "corpus_context": "(1)إ ذا استحق بعض المبيع أو وجد مثقال بتكليف وكانت خس",
+        "pdf_geometry": [
+          {
+            "page": 57,
+            "visual_gap_points": 0.189,
+            "median_line_space_points": 3.069,
+            "line_context": ")١ (إ ذا استحق بعض المبيع أو وجد مثقال بتكليف وكانت خسارة المشتري"
+          }
+        ],
+        "proposed_join": "إذا",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "إ ذا",
+        "article_number": 515,
+        "corpus_context": "(1)إ ذا اتفق على أن أحد الشركاء ال يساهم في أرباح الش",
+        "pdf_geometry": [
+          {
+            "page": 67,
+            "visual_gap_points": 0.173,
+            "median_line_space_points": 3.069,
+            "line_context": ")١ (إ ذا اتفق على أن أحد الشركاء ال يساهم في أرباح الشركة أو في"
+          }
+        ],
+        "proposed_join": "إذا",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      },
+      {
+        "candidate": "المد ين",
+        "article_number": 184,
+        "corpus_context": "ين، أو مما حصل عليه من التأمينات أو ترك دعواه قبل المد ين الحقيقى تسقط بالتقادم. ويلتزم المدين الحقي",
+        "pdf_geometry": [
+          {
+            "page": 22,
+            "visual_gap_points": 0.012,
+            "median_line_space_points": 3.069,
+            "line_context": "عليه من التأمينات أو ترك دعواه قبل المد ين الحقيقى تسقط بالتقادم. ويلتزم"
+          }
+        ],
+        "proposed_join": "المدين",
+        "basis": "same visual word; extracted gap is near zero and far below the ~3.069-point normal word-space on the line"
+      }
+    ],
+    "manual_review_occurrence_count": 25,
+    "manual_pattern_count": 5,
+    "manual_review_candidates": [
+      {
+        "candidate": "ع لى",
+        "article_number": 840,
+        "corpus_context": "بينهم من لم تتوافر فيه األهلية، وجب تصديق المحكمة ع لى حكم القسمة بعد أن يصبح نه ائيا، وذلك وفقا لما",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 378,
+        "corpus_context": "وتوجه إلى ورثة المدين أو أوصيائهم إن كانوا قصرا، بأ نه م ال يعلمون بوجود الدين أو يعلمون بحصول الوفا",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 508,
+        "corpus_context": "تعتبر حصص الشركاء متساوية القيمة، وأ نه ا واردة على ملكية المال ال على مجرد االنتفاع ",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 565,
+        "corpus_context": "لذلك مقتض. (2)فإذا كانت العين المؤجرة في حالة من شأ نه ا أن تعرض صحة المستأجر أو من يعيشون معه أو مس",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 637,
+        "corpus_context": " من المصروفات. (2)أما المصروفات النافعة فتتبع فى شأ نه ا األحكام الخاصة بالمصروفات التى ينفقها من يج",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 644,
+        "corpus_context": "يجوز للمعير أ ن يطلب فى آي وقت إ نه اء العارية فى األحوال اآلت",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 658,
+        "corpus_context": "رتفاع حداً يجعل تنفيذ العقد عسيرا. (4)على أنه إذا أ نه ار التوازن االقتصادي بين التزامات كل من رب ال",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 673,
+        "corpus_context": " آيه إدارة يقظة غير مقدرة أن تتوقع حصوله أو أن تدرأ نتائجه. ويعتبر اإلضراب حادثا ً مفاجئا ً إذا، است",
+        "pdf_geometry": [
+          {
+            "page": 93,
+            "visual_gap_points": 5.226,
+            "median_line_space_points": 3.069,
+            "line_context": " تتوقع حصوله أو أن تدرأ نتائجه . ويعتبر اإلضراب حادثا ً مفاجئا ً إذا"
+          }
+        ],
+        "reason": "geometry shows a normal inter-word gap or ambiguous spacing, so joining would risk merging separate words"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 696,
+        "corpus_context": "مخالفته شروط العقد، إلى أن يكون هو فى الظاهر الذى أ نه ى العقد. (2) ونقل العامل إلى مركز أقل ميزة أو",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 727,
+        "corpus_context": " حتى عن فعل المترددين على الفندق أو الخان. (2)غير أ نه م ال يكونون مسئولين فيما يتعلق بالنقود واألور",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 841,
+        "corpus_context": "إذا لم تكن القسمة عينا، أو كان من شأ نه ا إحداث نقص كبير فى قيمة المال، المراد قسمته،",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 875,
+        "corpus_context": "هم فى اإلرث وانتقال أموالهم التركة إليهم تسرى فى شأ نه ا أحكام الشريعة اإلسالمية والقوانين الصادرة ف",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 891,
+        "corpus_context": "استئذان المحكمة بوفاء ديون التركة التى لم يقم فى شأ نه ا نزاع أما الديون التى توزع فيها فتسوى بعد ال",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 924,
+        "corpus_context": "(1)إذا أقام شخص من عنده منشآت على أرض يعلم أ نه ا مملوكة لغيره دون رضاء صاحب األرض، كان لهذا ",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 980,
+        "corpus_context": "وفات الضرورية. (2)أما المصروفات النافعة فيسرى فى شأ نه ا أحكام المادتين ٤٢٩، ٥٢٩. (3)، فإذا كانت الم",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 989,
+        "corpus_context": "ة واإلصالحات الجسيمة التى لم تنشأ عن خطأ المنتفع فأ نه ا تكون على المالك، ويلتزم المنتفع بأن يؤدى لم",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 1012,
+        "corpus_context": "ى أرض غير موقوفة وقت العمل به ذا القانون تسرى فى شأ نه ا األحكام المبينة فى المواد السابقة بعض أنواع",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 1017,
+        "corpus_context": "هما عالمة ظاهرة فأنشأ بذلك عالقة تبعية بينهما من شأ نه ا أن تدل على وجود ارتفاق لو أن العق ارين كانا",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 1046,
+        "corpus_context": "نت المخالصة أو الحوالة لمدة تزيد على ثالث سنوات، فأ نه ا ال تكون نافذة فى حق الدائن المر ته، ن ما لم",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 1048,
+        "corpus_context": "لول الدين. (3)وفى جميع األحوال إذا وقعت أعمال من شأ نه ا أن تعرض العقار المرهون للهالك أو التلف أو ت",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ ن",
+        "article_number": 1111,
+        "corpus_context": " نفس المرتبة ما يأتي: (أ) المصروفات الضرورية التى أ نفقت للمحافظة على الشيء. (ب) التعويضات عن األضرا",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "أ و",
+        "article_number": 646,
+        "corpus_context": "ة عقد يتعهد بمقتضاه أحد المتعاقدين أن يصنع شيئا ً أ وأن يؤدى عمال لقاء أجر يتعهد بهالمتعاقد اآلخر ال",
+        "pdf_geometry": [
+          {
+            "page": 88,
+            "visual_gap_points": 4.973,
+            "median_line_space_points": 3.069,
+            "line_context": " المقاولة عقد يتعهد بمقتضاه أحد المتعاقدين أن يصنع شيئا ً أ وأن يؤدى"
+          }
+        ],
+        "reason": "geometry shows a normal inter-word gap or ambiguous spacing, so joining would risk merging separate words"
+      },
+      {
+        "candidate": "أ و",
+        "article_number": 1018,
+        "corpus_context": "ف، شاء كأن يمنع من تجاوز معين فى االرتفاق بالبناء أ وفى مساحة رقعته فإن هذه القيود تكون حقوق ارتفاق ",
+        "pdf_geometry": [
+          {
+            "page": 147,
+            "visual_gap_points": 3.754,
+            "median_line_space_points": 3.069,
+            "line_context": " ، شاء كأن يمنع من تجاوز معين فى االرتفاق بالبناء أ وفى مساحة رقعته"
+          }
+        ],
+        "reason": "geometry shows a normal inter-word gap or ambiguous spacing, so joining would risk merging separate words"
+      },
+      {
+        "candidate": "إ ذا",
+        "article_number": 525,
+        "corpus_context": "إ ذا كان ألحد الشركاء دائنون شخصيون، فليس لهم أثنا",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      },
+      {
+        "candidate": "الوف اء",
+        "article_number": 1105,
+        "corpus_context": " استتراله من قيمة الثمار، دون إخالل بحق المدين فى الوف اء بالدين فى أى وقت أراد. ا",
+        "pdf_geometry": [],
+        "reason": "exact candidate was not independently located as one same-line raw span on the recorded source page; no automatic change"
+      }
+    ],
+    "prohibited_rule": "Never remove spaces generically between Arabic tokens. Apply only the listed article-specific, exact-context joins after preserving before/after logs."
+  },
+  "punctuation": {
+    "article_246": {
+      "action": "unchanged",
+      "reason": "still ambiguous"
+    },
+    "apostrophes": {
+      "requested_articles": [
+        7,
+        8,
+        10,
+        11,
+        13,
+        14,
+        46
+      ],
+      "occurrence_count": 10,
+      "findings": [
+        {
+          "article_number": 7,
+          "context": "سري علي المسائل الخاصة ببدء التقادم ووقفه وانقطاعه' وذلك عن المدة السابقة علي العمل بالنصوص الجديدة.",
+          "source_page": 2,
+          "raw_character": "'",
+          "glyph_bbox": [
+            475.885,
+            169.309,
+            477.993,
+            181.618
+          ],
+          "rendered_finding": "A visible straight apostrophe-like vertical mark is present in the source PDF at this position; it is not a character invented by text extraction.",
+          "automatic_action": "none"
+        },
+        {
+          "article_number": 8,
+          "context": "لقانون القديم أقصر من المدة التي قررها النص الجديد' فإن التقادم يتم بانقضاء هذا الباقي.",
+          "source_page": 2,
+          "raw_character": "'",
+          "glyph_bbox": [
+            475.885,
+            169.309,
+            477.993,
+            181.618
+          ],
+          "rendered_finding": "A visible straight apostrophe-like vertical mark is present in the source PDF at this position; it is not a character invented by text extraction.",
+          "automatic_action": "none"
+        },
+        {
+          "article_number": 10,
+          "context": "حديد نوع هذه العالقات في قضية تتنازع فيها القوانين' لمعرفة القانون الواجب تطبيقه من بينها.",
+          "source_page": 2,
+          "raw_character": "'",
+          "glyph_bbox": [
+            475.885,
+            169.309,
+            477.993,
+            181.618
+          ],
+          "rendered_finding": "A visible straight apostrophe-like vertical mark is present in the source PDF at this position; it is not a character invented by text extraction.",
+          "automatic_action": "none"
+        },
+        {
+          "article_number": 11,
+          "context": "تصرفات المالية التي تعقد في مصر وتترتب آثارها فيها' إذا كان أحد الطرفين أجنبياً ناقص األهلية وكان نق",
+          "source_page": 2,
+          "raw_character": "'",
+          "glyph_bbox": [
+            475.885,
+            169.309,
+            477.993,
+            181.618
+          ],
+          "rendered_finding": "A visible straight apostrophe-like vertical mark is present in the source PDF at this position; it is not a character invented by text extraction.",
+          "automatic_action": "none"
+        },
+        {
+          "article_number": 11,
+          "context": "رجع إلي سبب فيه خفاء ال يسهل علي الطرف اآلخر تبينه' فإن هذا السبب ال يؤثر في أهليته. (2) أما النظام ",
+          "source_page": 2,
+          "raw_character": "'",
+          "glyph_bbox": [
+            475.885,
+            169.309,
+            477.993,
+            181.618
+          ],
+          "rendered_finding": "A visible straight apostrophe-like vertical mark is present in the source PDF at this position; it is not a character invented by text extraction.",
+          "automatic_action": "none"
+        },
+        {
+          "article_number": 11,
+          "context": "ي الفعلي. ومع ذلك فإذا باشرت نشاطها الرئيسي في مصر' فان القانون المصري هو الذي يسري.",
+          "source_page": 2,
+          "raw_character": "'",
+          "glyph_bbox": [
+            475.885,
+            169.309,
+            477.993,
+            181.618
+          ],
+          "rendered_finding": "A visible straight apostrophe-like vertical mark is present in the source PDF at this position; it is not a character invented by text extraction.",
+          "automatic_action": "none"
+        },
+        {
+          "article_number": 13,
+          "context": "قت انعقاد الزواج علي اآلثار التي يرتبها عقد الزواج' بما في ذلك من أثر بالنسبة إلي المال. (2) أما الط",
+          "source_page": 3,
+          "raw_character": "'",
+          "glyph_bbox": [
+            456.619,
+            63.809,
+            458.728,
+            76.118
+          ],
+          "rendered_finding": "A visible straight apostrophe-like vertical mark is present in the source PDF at this position; it is not a character invented by text extraction.",
+          "automatic_action": "none"
+        },
+        {
+          "article_number": 13,
+          "context": "ما في ذلك من أثر بالنسبة إلي المال. (2) أما الطالق' ويسري علي التطليق واالنفصال قانون الدولة التي ين",
+          "source_page": 3,
+          "raw_character": "'",
+          "glyph_bbox": [
+            456.619,
+            63.809,
+            458.728,
+            76.118
+          ],
+          "rendered_finding": "A visible straight apostrophe-like vertical mark is present in the source PDF at this position; it is not a character invented by text extraction.",
+          "automatic_action": "none"
+        },
+        {
+          "article_number": 14,
+          "context": "بقتين إذا كان أحد الزوجين مصرياً وقت انعقاد الزواج' يسري القانون المصري وحده، فيها علي شرط األهلية ل",
+          "source_page": 3,
+          "raw_character": "'",
+          "glyph_bbox": [
+            456.619,
+            63.809,
+            458.728,
+            76.118
+          ],
+          "rendered_finding": "A visible straight apostrophe-like vertical mark is present in the source PDF at this position; it is not a character invented by text extraction.",
+          "automatic_action": "none"
+        },
+        {
+          "article_number": 46,
+          "context": "الرش د وكل من بلغ سن الرشد وكان سفيهاً أو ذا غفلة ' يكون ناقص األهلية وفقاً لما يقرره القانون.",
+          "source_page": 6,
+          "raw_character": "'",
+          "glyph_bbox": [
+            498.79,
+            441.039,
+            500.899,
+            453.348
+          ],
+          "rendered_finding": "A visible straight apostrophe-like vertical mark is present in the source PDF at this position; it is not a character invented by text extraction.",
+          "automatic_action": "none"
+        }
+      ],
+      "conclusion": "The straight apostrophe-like mark is visibly present in the source PDF at all ten extracted occurrences. Do not automatically replace or delete it. Several early records repeat the same source-page footnote/heading text, so any later cleanup should first address leakage provenance, not punctuation shape."
+    }
+  },
+  "repealed_article_groups": {
+    "54-80": {
+      "source_page": 7,
+      "source_representation": "One bilingual range notice: English says Articles 54-80 have been repealed by Presidential Decree; Arabic likewise states the range is repealed and gives decree history. The PDF does not print 27 separate article bodies.",
+      "corpus_verification": "All 27 records intentionally repeat the same unique Arabic notice and the same unique English notice. This accurately preserves the single source range notice per required article record.",
+      "change_recommended": false
+    },
+    "389-417": {
+      "source_page": 53,
+      "source_representation": "One bilingual range heading/notice states Articles 389-417 repealed / المواد من ٣٨٩ إلى ٤١٧ ملغاة. The PDF then proceeds to Article 418.",
+      "corpus_verification": "All 29 records intentionally repeat the same unique Arabic notice and the same unique English notice. This matches the source range representation.",
+      "change_recommended": false
+    }
+  },
+  "exact_recommendation_for_safe_normalization_pass_2": {
+    "automatic_changes_recommended": [
+      "Map U+E811→لمج, U+E812→به, U+E814→ته, and U+E815→نه, logging every before/after occurrence.",
+      "Remove the trailing ا for the 754 already-identified records only with the stored PDF-layout predicate; leave Article 1122 trailing ل unchanged.",
+      "Apply only the 14 listed article-specific split-word joins (7 patterns); do not broaden them."
+    ],
+    "leave_unchanged": [
+      "Article 1122 trailing ل",
+      "all 25 split-word manual-review occurrences",
+      "all apostrophes in Articles 7, 8, 10, 11, 13, 14, and 46",
+      "Article 246 punctuation",
+      "repealed ranges 54-80 and 389-417",
+      "Article 1022 null Arabic text",
+      "all metadata"
+    ],
+    "required_pass2_assertions": [
+      "input clean_v1 hash unchanged before applying a future pass",
+      "exact approved article/occurrence sets only",
+      "before/after log for every field change",
+      "record count, order, schema, metadata, and Article 1022 null preserved"
+    ]
+  }
+}

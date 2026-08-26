@@ -1,0 +1,801 @@
+{
+  "total_extracted_articles": 1149,
+  "article_number_range": [
+    1,
+    1149
+  ],
+  "duplicate_article_numbers": [],
+  "missing_article_numbers": [],
+  "expected_missing_arabic_text": [
+    1022
+  ],
+  "unexpected_missing_arabic_text": [],
+  "articles_missing_english_text": [],
+  "source_page_range": [
+    1,
+    170
+  ],
+  "hierarchy_transitions": [
+    {
+      "article_number": 1,
+      "changes": {
+        "book": "باب تمهيدي — أحكام عامة",
+        "chapter": "SECTION I — Laws and their Applications",
+        "section": "1. Laws and Rights"
+      }
+    },
+    {
+      "article_number": 6,
+      "changes": {
+        "section": "2. The Application of Laws",
+        "topic": "Conflicts of law as to time"
+      }
+    },
+    {
+      "article_number": 10,
+      "changes": {
+        "topic": "Conflicts of law as to place"
+      }
+    },
+    {
+      "article_number": 29,
+      "changes": {
+        "chapter": "SECTION II — Persons",
+        "section": "1. Individuals",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 81,
+      "changes": {
+        "chapter": "SECTION III — The Classification of Things and Property",
+        "section": null
+      }
+    },
+    {
+      "article_number": 89,
+      "changes": {
+        "book": "BOOK I — OBLIGATIONS GENERALLY",
+        "chapter": "CHAPTER I — Sources of Obligations",
+        "section": "Section I — Contracts",
+        "topic": "1. Elements of Contracts — Consent:"
+      }
+    },
+    {
+      "article_number": 145,
+      "changes": {
+        "topic": "2. The Effects of a Contract"
+      }
+    },
+    {
+      "article_number": 157,
+      "changes": {
+        "topic": "3. Dissolution of contract"
+      }
+    },
+    {
+      "article_number": 162,
+      "changes": {
+        "section": "SECTION II — Unilateral Undertakings",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 163,
+      "changes": {
+        "section": "SECTION III — Unlawful Acts",
+        "topic": "1. Liability Arising from Personal Acts"
+      }
+    },
+    {
+      "article_number": 173,
+      "changes": {
+        "topic": "2- Liability arising from the acts of another"
+      }
+    },
+    {
+      "article_number": 176,
+      "changes": {
+        "topic": "3- Liability Arising from Things"
+      }
+    },
+    {
+      "article_number": 179,
+      "changes": {
+        "section": "Section IV — Enrichment without Just Cause",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 181,
+      "changes": {
+        "topic": "1- Payment not Due"
+      }
+    },
+    {
+      "article_number": 188,
+      "changes": {
+        "topic": "2- Voluntary Agency"
+      }
+    },
+    {
+      "article_number": 198,
+      "changes": {
+        "section": "Section V — The Law",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 199,
+      "changes": {
+        "chapter": "CHAPTER II — The Effects of Obligations",
+        "section": null
+      }
+    },
+    {
+      "article_number": 203,
+      "changes": {
+        "section": "Section I — Specific Performance"
+      }
+    },
+    {
+      "article_number": 215,
+      "changes": {
+        "section": "Section II — Compensation in Lieu of Performance"
+      }
+    },
+    {
+      "article_number": 234,
+      "changes": {
+        "section": "Section III — Means of Realizing and Securing the Rights of Creditors"
+      }
+    },
+    {
+      "article_number": 235,
+      "changes": {
+        "topic": "1. Means of Realizing the Rights of Creditors"
+      }
+    },
+    {
+      "article_number": 246,
+      "changes": {
+        "topic": "2. One of the Means of Security: the Right of Retention"
+      }
+    },
+    {
+      "article_number": 265,
+      "changes": {
+        "chapter": "Chapter III — Kinds of Conditions Modifying the Effects of Obligations",
+        "section": "Section I — Conditional Obligations and Time Clauses",
+        "topic": "1. Conditional Obligations"
+      }
+    },
+    {
+      "article_number": 271,
+      "changes": {
+        "topic": "2. Time Clauses"
+      }
+    },
+    {
+      "article_number": 275,
+      "changes": {
+        "section": "Section II — Plurality of Objects of an Obligation",
+        "topic": "1. Alternative Obligations"
+      }
+    },
+    {
+      "article_number": 278,
+      "changes": {
+        "topic": "2. Facultative Obligations"
+      }
+    },
+    {
+      "article_number": 279,
+      "changes": {
+        "section": "Section III — Plurality of Parties to an Obligation",
+        "topic": "1. Joint and Several Obligations"
+      }
+    },
+    {
+      "article_number": 300,
+      "changes": {
+        "topic": "2. Indivisibility"
+      }
+    },
+    {
+      "article_number": 303,
+      "changes": {
+        "chapter": "Chapter IV — Transmission of an Obligation",
+        "section": "Section I — The Assignment of a Right",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 315,
+      "changes": {
+        "section": "Section II — Assignment of Debt"
+      }
+    },
+    {
+      "article_number": 323,
+      "changes": {
+        "chapter": "Chapter V — The Extinction of Obligations",
+        "section": "Section I — Payment",
+        "topic": "1. The Two Parties to Payment"
+      }
+    },
+    {
+      "article_number": 341,
+      "changes": {
+        "topic": "2. Means of Payment"
+      }
+    },
+    {
+      "article_number": 350,
+      "changes": {
+        "section": "Section II",
+        "topic": "1. Giving in Payment"
+      }
+    },
+    {
+      "article_number": 352,
+      "changes": {
+        "topic": "2. Novation and Delegation"
+      }
+    },
+    {
+      "article_number": 362,
+      "changes": {
+        "topic": "3. Compensation (set off)"
+      }
+    },
+    {
+      "article_number": 370,
+      "changes": {
+        "topic": "4. Merger"
+      }
+    },
+    {
+      "article_number": 371,
+      "changes": {
+        "section": "Section III — The Extinction of Obligations without Payment",
+        "topic": "1. Release of the Obligation"
+      }
+    },
+    {
+      "article_number": 373,
+      "changes": {
+        "topic": "2. Impossibility of Performance"
+      }
+    },
+    {
+      "article_number": 374,
+      "changes": {
+        "topic": "3. Extinctive Prescription"
+      }
+    },
+    {
+      "article_number": 418,
+      "changes": {
+        "book": "BOOK II — SPECIFIC CONTRACTS",
+        "chapter": "Chapter I — Contracts as Regards Ownership",
+        "section": "Section I — Sale",
+        "topic": "1.Sale in General — Elements of Sale"
+      }
+    },
+    {
+      "article_number": 465,
+      "changes": {
+        "topic": "2.Different Forms of Sale — Sale with a Right of Redemption"
+      }
+    },
+    {
+      "article_number": 482,
+      "changes": {
+        "section": "Section II — Exchange",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 486,
+      "changes": {
+        "section": "Section III — Gifts",
+        "topic": "1.Elements of a Gift"
+      }
+    },
+    {
+      "article_number": 493,
+      "changes": {
+        "topic": "2.The Effects of a Gift"
+      }
+    },
+    {
+      "article_number": 500,
+      "changes": {
+        "topic": "3.Revocation of Gifts"
+      }
+    },
+    {
+      "article_number": 505,
+      "changes": {
+        "section": "Section IV — Partnership",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 516,
+      "changes": {
+        "topic": "2- The Management of Partnership"
+      }
+    },
+    {
+      "article_number": 521,
+      "changes": {
+        "topic": "3- The effects of partnership."
+      }
+    },
+    {
+      "article_number": 526,
+      "changes": {
+        "topic": "4- Ways in which a partnership comes to an end"
+      }
+    },
+    {
+      "article_number": 532,
+      "changes": {
+        "topic": "5- Liquidation and partition of the partnership property"
+      }
+    },
+    {
+      "article_number": 538,
+      "changes": {
+        "section": "Section V — Loans and Annuities",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 545,
+      "changes": {
+        "topic": "2- Annuities."
+      }
+    },
+    {
+      "article_number": 549,
+      "changes": {
+        "section": "Section VI — Compromise",
+        "topic": "1- The elements of compromise"
+      }
+    },
+    {
+      "article_number": 553,
+      "changes": {
+        "topic": "2- The effects of compromise"
+      }
+    },
+    {
+      "article_number": 556,
+      "changes": {
+        "topic": "3- Nullity of compromise"
+      }
+    },
+    {
+      "article_number": 558,
+      "changes": {
+        "chapter": "Chapter II — Contracts relating to the use of a thing",
+        "section": "Section I — Leases",
+        "topic": "1- Leases Generally — Elements of a lease"
+      }
+    },
+    {
+      "article_number": 610,
+      "changes": {
+        "topic": "2- Certain kinds of leases. — Leases of agricultural land."
+      }
+    },
+    {
+      "article_number": 635,
+      "changes": {
+        "section": "Section II — Loan for Use",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 636,
+      "changes": {
+        "topic": "1- Obligations of the Lender"
+      }
+    },
+    {
+      "article_number": 639,
+      "changes": {
+        "topic": "2- Obligations of the Borrower"
+      }
+    },
+    {
+      "article_number": 643,
+      "changes": {
+        "topic": "3- Termination of the Loan for Use"
+      }
+    },
+    {
+      "article_number": 646,
+      "changes": {
+        "chapter": "Chapter III — Contracts for the hire of services",
+        "section": "Section I — Contracts for work and concessions of public utility — services",
+        "topic": "1- Contracts for work"
+      }
+    },
+    {
+      "article_number": 668,
+      "changes": {
+        "topic": "2- Concessions of Public Utility Services"
+      }
+    },
+    {
+      "article_number": 674,
+      "changes": {
+        "section": "Section II — Contracts of Service",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 677,
+      "changes": {
+        "topic": "1- Elements of a Contract"
+      }
+    },
+    {
+      "article_number": 685,
+      "changes": {
+        "topic": "2- Effects of a Contract — The Obligations of the Worker"
+      }
+    },
+    {
+      "article_number": 699,
+      "changes": {
+        "section": "Section III — Mandate",
+        "topic": "1- The Elements of Mandate"
+      }
+    },
+    {
+      "article_number": 703,
+      "changes": {
+        "topic": "2- The Effects of a Mandate"
+      }
+    },
+    {
+      "article_number": 718,
+      "changes": {
+        "section": "Section IV — Deposit",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 719,
+      "changes": {
+        "topic": "1- The Obligations of the Depository"
+      }
+    },
+    {
+      "article_number": 724,
+      "changes": {
+        "topic": "2- The Obligations of the Depositor"
+      }
+    },
+    {
+      "article_number": 726,
+      "changes": {
+        "topic": "3- Certain Kinds of Deposits"
+      }
+    },
+    {
+      "article_number": 729,
+      "changes": {
+        "section": "Section V — Judicial Custody",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 739,
+      "changes": {
+        "chapter": "Chapter IV — Aleatory Contracts",
+        "section": "Section I — Gaming and Betting"
+      }
+    },
+    {
+      "article_number": 741,
+      "changes": {
+        "section": "Section II — Life Annuities"
+      }
+    },
+    {
+      "article_number": 747,
+      "changes": {
+        "section": "Section III — Contracts of Insurance",
+        "topic": "1- General Provisions"
+      }
+    },
+    {
+      "article_number": 754,
+      "changes": {
+        "topic": "2- Certain Classes of Insurance — Life Insurance"
+      }
+    },
+    {
+      "article_number": 772,
+      "changes": {
+        "chapter": "Chapter V — Suretyship",
+        "section": "Section I — The Elements of Suretyship",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 782,
+      "changes": {
+        "topic": "1- The Relationship between the Surety and the — Creditor"
+      }
+    },
+    {
+      "article_number": 798,
+      "changes": {
+        "topic": "2- The Relationship between the Surety and the Debtor"
+      }
+    },
+    {
+      "article_number": 802,
+      "changes": {
+        "book": "BOOK III — The Principal Real Rights",
+        "chapter": "Chapter I — The Right of Ownership",
+        "section": "Section I The Right of Ownership in General",
+        "topic": "1- Limits and Sanctions"
+      }
+    },
+    {
+      "article_number": 806,
+      "changes": {
+        "topic": "2- Restrictions on the Right of Ownership"
+      }
+    },
+    {
+      "article_number": 825,
+      "changes": {
+        "topic": "3- Joint Ownership — Provisions Relating to Joint Ownership"
+      }
+    },
+    {
+      "article_number": 870,
+      "changes": {
+        "section": "Section II — Acquisition of Ownership",
+        "topic": "1. Acquisition by Appropriation — The Appropriation of Movables without an Owner"
+      }
+    },
+    {
+      "article_number": 915,
+      "changes": {
+        "topic": "3- Acquisition by Will"
+      }
+    },
+    {
+      "article_number": 932,
+      "changes": {
+        "topic": "5- Acquisition by Contract"
+      }
+    },
+    {
+      "article_number": 935,
+      "changes": {
+        "topic": "6- Acquisition by Preemption — Conditions for the Exercise of Preemption"
+      }
+    },
+    {
+      "article_number": 949,
+      "changes": {
+        "topic": "7- Possession — Acquisition, Transfer and Loss of Possession"
+      }
+    },
+    {
+      "article_number": 985,
+      "changes": {
+        "chapter": "Chapter II — Rights Derived From the Right of Ownership",
+        "section": "Section I — The Right to Usufruct, the right of User and the right of — Occupation",
+        "topic": "1- Usufruct"
+      }
+    },
+    {
+      "article_number": 996,
+      "changes": {
+        "topic": "2-The Right of User and Occupation"
+      }
+    },
+    {
+      "article_number": 999,
+      "changes": {
+        "section": "Section II — The Right of Hekr",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 1015,
+      "changes": {
+        "section": "Section III — Servitudes"
+      }
+    },
+    {
+      "article_number": 1030,
+      "changes": {
+        "book": "BOOK IV — ACCESSORY RIGHTS OR REAL SECURITIES",
+        "chapter": "Chapter I — Mortgages",
+        "section": null
+      }
+    },
+    {
+      "article_number": 1031,
+      "changes": {
+        "section": "Section I — The Constitution of Mortgages"
+      }
+    },
+    {
+      "article_number": 1043,
+      "changes": {
+        "section": "Section II — The Effects of a Mortgage",
+        "topic": "1-The Effects of a Mortgage as Between the Parties As — Regards the Mortgagor"
+      }
+    },
+    {
+      "article_number": 1053,
+      "changes": {
+        "topic": "2- The Effects of Mortgage as Regards Third Parties"
+      }
+    },
+    {
+      "article_number": 1082,
+      "changes": {
+        "section": "Section III — Extinguishment of the Mortgage",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 1085,
+      "changes": {
+        "chapter": "Chapter II — Judgment Charges upon Immovable Property",
+        "section": "Section I — The Constitution of a Judgment Charge"
+      }
+    },
+    {
+      "article_number": 1094,
+      "changes": {
+        "section": "Section II — The Effects of a Judgment Charge, its Reduction and — Extinguishment"
+      }
+    },
+    {
+      "article_number": 1096,
+      "changes": {
+        "chapter": "Chapter III — Rights Derived from the Right of Ownership Pledge",
+        "section": "Section I — Elements of a Pledge"
+      }
+    },
+    {
+      "article_number": 1099,
+      "changes": {
+        "section": "Section II — The Effects of a Pledge",
+        "topic": "1- Between the contracting parties — Obligations of the Pledgor"
+      }
+    },
+    {
+      "article_number": 1109,
+      "changes": {
+        "topic": "2- As Regards Third Parties"
+      }
+    },
+    {
+      "article_number": 1112,
+      "changes": {
+        "section": "Section III — Extinguishment of a Pledge",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 1114,
+      "changes": {
+        "section": "Section IV — Certain Kinds of Pledge",
+        "topic": "1- Pledge of an Immovable (Antichresis)"
+      }
+    },
+    {
+      "article_number": 1117,
+      "changes": {
+        "topic": "2- Pledge of a Movable"
+      }
+    },
+    {
+      "article_number": 1123,
+      "changes": {
+        "topic": "3- Pledge of Debts"
+      }
+    },
+    {
+      "article_number": 1130,
+      "changes": {
+        "chapter": "Chapter IV — Privileged Rights",
+        "section": "Section I — General Provisions",
+        "topic": null
+      }
+    },
+    {
+      "article_number": 1137,
+      "changes": {
+        "section": "Section II — Kinds of Privileges"
+      }
+    },
+    {
+      "article_number": 1138,
+      "changes": {
+        "topic": "1- General Privileges and Special Privileges over — Movables"
+      }
+    },
+    {
+      "article_number": 1147,
+      "changes": {
+        "topic": "2- Special Privileges over Immovables"
+      }
+    }
+  ],
+  "repealed_article_numbers_detected": [
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    389,
+    390,
+    391,
+    392,
+    393,
+    394,
+    395,
+    396,
+    397,
+    398,
+    399,
+    400,
+    401,
+    402,
+    403,
+    404,
+    405,
+    406,
+    407,
+    408,
+    409,
+    410,
+    411,
+    412,
+    413,
+    414,
+    415,
+    416,
+    417
+  ]
+}

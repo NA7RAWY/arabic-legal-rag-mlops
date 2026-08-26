@@ -1,0 +1,533 @@
+{
+  "audit_metadata": {
+    "source_corpus": "data/processed/civil_code_articles_clean_v2.json",
+    "baseline_corpus": "data/processed/civil_code_articles_clean_v1.json",
+    "normalization_log": "data/processed/normalization_pass2_log.json",
+    "audit_timestamp": "2026-08-26T20:27:22.046179+03:00",
+    "articles_audited": 1149,
+    "corpus_sha256": "ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+    "scope": "post Safe Normalization Pass 2 diagnostic audit; no audit findings auto-fixed"
+  },
+  "structural_integrity": {
+    "record_count": 1149,
+    "article_number_range": [
+      1,
+      1149
+    ],
+    "article_sequence_sorted": true,
+    "article_sequence_exact_1_to_1149": true,
+    "duplicate_article_numbers": [],
+    "missing_article_numbers": [],
+    "schema": [
+      "article_number",
+      "book",
+      "chapter",
+      "section",
+      "topic",
+      "text_ar",
+      "text_en",
+      "is_repealed",
+      "source_page",
+      "citation"
+    ],
+    "schema_integrity": true,
+    "metadata_unchanged_from_v1": true,
+    "record_order_unchanged_from_v1": true
+  },
+  "completeness": {
+    "null_text_ar": [
+      1022
+    ],
+    "expected_null_text_ar": [
+      1022
+    ],
+    "unexpected_null_text_ar": [],
+    "null_text_en": [],
+    "empty_strings": []
+  },
+  "unicode_integrity": {
+    "remaining_private_use_area_characters": {
+      "article_count": 0,
+      "occurrence_count": 0,
+      "article_numbers": [],
+      "representative_examples": []
+    },
+    "unicode_replacement_characters": {
+      "article_count": 0,
+      "occurrence_count": 0,
+      "article_numbers": [],
+      "representative_examples": []
+    },
+    "control_characters": {
+      "article_count": 0,
+      "occurrence_count": 0,
+      "article_numbers": [],
+      "representative_examples": []
+    }
+  },
+  "remaining_artifacts": {
+    "suspicious_trailing_isolated_arabic_characters": {
+      "article_count": 1,
+      "occurrence_count": 1,
+      "article_numbers": [
+        1122
+      ],
+      "representative_examples": [
+        {
+          "article_number": 1122,
+          "source_page": 165,
+          "trailing_character": "ل",
+          "context": "أحكام القوانين واللوائح المتعلقة بأحوال خاصة فى رهن المنقول. ل"
+        }
+      ]
+    },
+    "suspicious_split_arabic_words": {
+      "methodology": "Primary count is the explicit Pass 2 manual-review occurrence set. A separate raw literal scan of the V1 60-token watchlist is retained only as a broad diagnostic because many literal matches occur inside valid larger words and are not candidate errors.",
+      "confirmed_manual_review_candidates": {
+        "article_count": 25,
+        "occurrence_count": 25,
+        "article_numbers": [
+          378,
+          508,
+          525,
+          565,
+          637,
+          644,
+          646,
+          658,
+          673,
+          696,
+          727,
+          840,
+          841,
+          875,
+          891,
+          924,
+          980,
+          989,
+          1012,
+          1017,
+          1018,
+          1046,
+          1048,
+          1105,
+          1111
+        ],
+        "representative_examples": [
+          {
+            "article_number": 840,
+            "source_page": 119,
+            "candidate": "ع لى",
+            "context": "ئب أو كان بينهم من لم تتوافر فيه األهلية، وجب تصديق المحكمة ع لى حكم القسمة بعد أن يصبح نه ائيا، وذلك وفقا لما يقرره الق"
+          },
+          {
+            "article_number": 378,
+            "source_page": 51,
+            "candidate": "أ ن",
+            "context": "لقاء نفسه وتوجه إلى ورثة المدين أو أوصيائهم إن كانوا قصرا، بأ نه م ال يعلمون بوجود الدين أو يعلمون بحصول الوفاء."
+          },
+          {
+            "article_number": 508,
+            "source_page": 66,
+            "candidate": "أ ن",
+            "context": "تعتبر حصص الشركاء متساوية القيمة، وأ نه ا واردة على ملكية المال ال على مجرد االنتفاع به، ما لم "
+          },
+          {
+            "article_number": 565,
+            "source_page": 75,
+            "candidate": "أ ن",
+            "context": "ن إذا كان لذلك مقتض. (2)فإذا كانت العين المؤجرة في حالة من شأ نه ا أن تعرض صحة المستأجر أو من يعيشون معه أو مستخدميه أو "
+          },
+          {
+            "article_number": 637,
+            "source_page": 86,
+            "candidate": "أ ن",
+            "context": "ه ما أنفقه من المصروفات. (2)أما المصروفات النافعة فتتبع فى شأ نه ا األحكام الخاصة بالمصروفات التى ينفقها من يجوز الشيء و"
+          },
+          {
+            "article_number": 644,
+            "source_page": 87,
+            "candidate": "أ ن",
+            "context": "يجوز للمعير أ ن يطلب فى آي وقت إ نه اء العارية فى األحوال اآلتية: (أ) إذ"
+          },
+          {
+            "article_number": 658,
+            "source_page": 89,
+            "candidate": "أ ن",
+            "context": "غ هذا ًاالرتفاع حداً يجعل تنفيذ العقد عسيرا. (4)على أنه إذا أ نه ار التوازن االقتصادي بين التزامات كل من رب العمل، والمق"
+          },
+          {
+            "article_number": 673,
+            "source_page": 93,
+            "candidate": "أ ن",
+            "context": "كون فى وسع آيه إدارة يقظة غير مقدرة أن تتوقع حصوله أو أن تدرأ نتائجه. ويعتبر اإلضراب حادثا ً مفاجئا ً إذا، استطاع الملتز"
+          },
+          {
+            "article_number": 696,
+            "source_page": 98,
+            "candidate": "أ ن",
+            "context": "لجائزة أو مخالفته شروط العقد، إلى أن يكون هو فى الظاهر الذى أ نه ى العقد. (2) ونقل العامل إلى مركز أقل ميزة أو مالءمة من"
+          },
+          {
+            "article_number": 727,
+            "source_page": 102,
+            "candidate": "أ ن",
+            "context": "لء مسئولين حتى عن فعل المترددين على الفندق أو الخان. (2)غير أ نه م ال يكونون مسئولين فيما يتعلق بالنقود واألوراق المالية"
+          },
+          {
+            "article_number": 841,
+            "source_page": 119,
+            "candidate": "أ ن",
+            "context": "إذا لم تكن القسمة عينا، أو كان من شأ نه ا إحداث نقص كبير فى قيمة المال، المراد قسمته، بيع هذا ا"
+          },
+          {
+            "article_number": 875,
+            "source_page": 125,
+            "candidate": "أ ن",
+            "context": "ديد أنصبائهم فى اإلرث وانتقال أموالهم التركة إليهم تسرى فى شأ نه ا أحكام الشريعة اإلسالمية والقوانين الصادرة فى شأ ا نه."
+          }
+        ]
+      },
+      "confirmed_manual_review_occurrence_count": 25,
+      "confirmed_manual_review_article_count": 25,
+      "v1_watchlist_literal_scan_diagnostic": {
+        "pattern_count": 61,
+        "literal_match_occurrence_count": 1461,
+        "literal_match_article_count": 722,
+        "not_an_error_count": true,
+        "representative_examples": [
+          {
+            "article_number": 1,
+            "source_page": 1,
+            "candidate": "م ا",
+            "context": "ظها أو في فحواها. (2) فإذا لم يوجد نص تشريعي يمكن تطبيقه، حكم القاضي بمقتضى العرف، فإذا لم يوجد، فبمقتضى مبادئ الشريعة ا"
+          },
+          {
+            "article_number": 3,
+            "source_page": 1,
+            "candidate": "م ا",
+            "context": "تحسب المواعيد بالتقويم الميلادي، ما لم ينص هذا القانون على غير ذلك."
+          },
+          {
+            "article_number": 6,
+            "source_page": 1,
+            "candidate": "م ا",
+            "context": "صوص المتعلقة باألهلية تسري علي جميع األشخاص الذين تنطبق عليهم الشروط المقررة في هذه النصوص. (2) وإذا عاد شخص توافرت فيه "
+          },
+          {
+            "article_number": 6,
+            "source_page": 1,
+            "candidate": "في ه",
+            "context": "هلية تسري علي جميع األشخاص الذين تنطبق عليهم الشروط المقررة في هذه النصوص. (2) وإذا عاد شخص توافرت فيه األهلية بحسب نصوص"
+          },
+          {
+            "article_number": 6,
+            "source_page": 1,
+            "candidate": "فيه ا",
+            "context": "عليهم الشروط المقررة في هذه النصوص. (2) وإذا عاد شخص توافرت فيه األهلية بحسب نصوص قديمة ناقص األهلية بحسب نصوص جديدة فإن"
+          },
+          {
+            "article_number": 10,
+            "source_page": 2,
+            "candidate": "ف ال",
+            "context": "القانون المصري هو المرجع في تكييف العالقات عندما يطلب تحديد نوع هذه العالقات في قضية تتنازع "
+          },
+          {
+            "article_number": 11,
+            "source_page": 2,
+            "candidate": "م ا",
+            "context": " اآلخر تبينه' فإن هذا السبب ال يؤثر في أهليته. (2) أما النظام القانوني لألشخاص االعتبارية األجنبية من شركات وجمعيات ومؤس"
+          },
+          {
+            "article_number": 12,
+            "source_page": 2,
+            "candidate": "ل م",
+            "context": "يرجع في الشروط الموضوعية لصحة الزواج إلي قانون كل من الزوجين."
+          },
+          {
+            "article_number": 16,
+            "source_page": 3,
+            "candidate": "م ا",
+            "context": "ل الموضوعية الخاصة بالوالية والوصاية والقوامة وغيرها من النظم الموضوعية لحماية المحجور عليهم والغائبين، قانون الشخص التي"
+          },
+          {
+            "article_number": 17,
+            "source_page": 3,
+            "candidate": "فيه ا",
+            "context": "كل الوصية، قانون الموصي وقت اإليصاء أو قانون البلد الذي تمت فيه الوصية وكذلك الحكم في شكل سائر التصرفات المضافة إلي ما ب"
+          },
+          {
+            "article_number": 18,
+            "source_page": 3,
+            "candidate": "ول و",
+            "context": "ري بالنسبة إلي المنقول، قانون الجهة التي يوجد فيها هذا المنقول وقت تحقق السبب الذي ترتب عليه كسب الحيازة أو الملكية أو ا"
+          },
+          {
+            "article_number": 19,
+            "source_page": 3,
+            "candidate": "ك ل",
+            "context": "لتزامات التعاقدية. قانون الدولة التي يوجد فيها الموطن المشترك للمتعاقدين إذا اتحدا موطناً، فإن اختلفا موطنا سري قانون ال"
+          }
+        ]
+      }
+    },
+    "apostrophes": {
+      "article_count": 7,
+      "occurrence_count": 10,
+      "article_numbers": [
+        7,
+        8,
+        10,
+        11,
+        13,
+        14,
+        46
+      ],
+      "representative_examples": [
+        {
+          "article_number": 7,
+          "source_page": 2,
+          "context": " هي التي تسري علي المسائل الخاصة ببدء التقادم ووقفه وانقطاعه' وذلك عن المدة السابقة علي العمل بالنصوص الجديدة."
+        },
+        {
+          "article_number": 8,
+          "source_page": 2,
+          "context": "نص عليها القانون القديم أقصر من المدة التي قررها النص الجديد' فإن التقادم يتم بانقضاء هذا الباقي."
+        },
+        {
+          "article_number": 10,
+          "source_page": 2,
+          "context": "دما يطلب تحديد نوع هذه العالقات في قضية تتنازع فيها القوانين' لمعرفة القانون الواجب تطبيقه من بينها."
+        },
+        {
+          "article_number": 11,
+          "source_page": 2,
+          "context": "ذلك ففي التصرفات المالية التي تعقد في مصر وتترتب آثارها فيها' إذا كان أحد الطرفين أجنبياً ناقص األهلية وكان نقص األهلية "
+        },
+        {
+          "article_number": 11,
+          "source_page": 2,
+          "context": " األهلية يرجع إلي سبب فيه خفاء ال يسهل علي الطرف اآلخر تبينه' فإن هذا السبب ال يؤثر في أهليته. (2) أما النظام القانوني ل"
+        },
+        {
+          "article_number": 11,
+          "source_page": 2,
+          "context": "تها الرئيسي الفعلي. ومع ذلك فإذا باشرت نشاطها الرئيسي في مصر' فان القانون المصري هو الذي يسري."
+        },
+        {
+          "article_number": 13,
+          "source_page": 3,
+          "context": "ها الزوج وقت انعقاد الزواج علي اآلثار التي يرتبها عقد الزواج' بما في ذلك من أثر بالنسبة إلي المال. (2) أما الطالق' ويسري"
+        },
+        {
+          "article_number": 13,
+          "source_page": 3,
+          "context": " الزواج' بما في ذلك من أثر بالنسبة إلي المال. (2) أما الطالق' ويسري علي التطليق واالنفصال قانون الدولة التي ينتمي إليها "
+        },
+        {
+          "article_number": 14,
+          "source_page": 3,
+          "context": "ادتين السابقتين إذا كان أحد الزوجين مصرياً وقت انعقاد الزواج' يسري القانون المصري وحده، فيها علي شرط األهلية للزواج."
+        },
+        {
+          "article_number": 46,
+          "source_page": 6,
+          "context": "م يبلغ سن الرش د وكل من بلغ سن الرشد وكان سفيهاً أو ذا غفلة ' يكون ناقص األهلية وفقاً لما يقرره القانون."
+        }
+      ]
+    },
+    "punctuation_anomalies": {
+      "arabic_spaces_before_punctuation": {
+        "article_count": 1,
+        "occurrence_count": 1,
+        "article_numbers": [
+          246
+        ],
+        "representative_examples": [
+          {
+            "article_number": 246,
+            "source_page": 31,
+            "match": " !",
+            "context": "ه. أو مادام الدائن لم يقم بتقديم تأمين كاف للوفاء بالتزامه.. ! (2) ويكون ذلك بوجه خاص لحائز الشيء أو محرزه إذا هو انفق ع"
+          }
+        ]
+      },
+      "english_spaces_before_punctuation": {
+        "article_count": 0,
+        "occurrence_count": 0,
+        "article_numbers": [],
+        "representative_examples": []
+      },
+      "repeated_arabic_punctuation": {
+        "article_count": 1,
+        "occurrence_count": 1,
+        "article_numbers": [
+          246
+        ],
+        "representative_examples": [
+          {
+            "article_number": 246,
+            "source_page": 31,
+            "match": "..",
+            "context": " به. أو مادام الدائن لم يقم بتقديم تأمين كاف للوفاء بالتزامه.. ! (2) ويكون ذلك بوجه خاص لحائز الشيء أو محرزه إذا هو انفق"
+          }
+        ]
+      },
+      "repeated_english_punctuation": {
+        "article_count": 0,
+        "occurrence_count": 0,
+        "article_numbers": [],
+        "representative_examples": []
+      },
+      "article_246_unchanged": true
+    }
+  },
+  "repealed_groups": {
+    "54-80": {
+      "record_count": 27,
+      "all_repealed": true,
+      "text_unchanged_from_v1": true,
+      "unique_arabic_text_count": 1,
+      "unique_english_text_count": 1
+    },
+    "389-417": {
+      "record_count": 29,
+      "all_repealed": true,
+      "text_unchanged_from_v1": true,
+      "unique_arabic_text_count": 1,
+      "unique_english_text_count": 1
+    }
+  },
+  "exact_repeated_text_groups": [
+    {
+      "article_numbers": [
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80
+      ],
+      "count": 27,
+      "is_repealed_group": true
+    },
+    {
+      "article_numbers": [
+        389,
+        390,
+        391,
+        392,
+        393,
+        394,
+        395,
+        396,
+        397,
+        398,
+        399,
+        400,
+        401,
+        402,
+        403,
+        404,
+        405,
+        406,
+        407,
+        408,
+        409,
+        410,
+        411,
+        412,
+        413,
+        414,
+        415,
+        416,
+        417
+      ],
+      "count": 29,
+      "is_repealed_group": true
+    }
+  ],
+  "pass2_verification": {
+    "pua_replacements_applied": 39,
+    "trailing_artifacts_removed": 754,
+    "split_word_joins_applied": 14,
+    "remaining_target_pua_count": 0,
+    "remaining_all_pua_count": 0,
+    "remaining_suspicious_trailing_character_count": 1,
+    "remaining_split_word_candidate_count": 25,
+    "remaining_split_word_candidate_articles": 25
+  },
+  "safety_assertions": {
+    "output_has_exactly_1149_records": true,
+    "record_order_unchanged": true,
+    "schema_unchanged": true,
+    "article_numbers_unchanged": true,
+    "metadata_unchanged": true,
+    "text_en_unchanged": true,
+    "article_1022_text_ar_null": true,
+    "article_1122_text_ar_unchanged": true,
+    "article_1122_trailing_l_preserved": true,
+    "protected_repealed_54_80_unchanged": true,
+    "protected_repealed_389_417_unchanged": true,
+    "article_246_text_ar_unchanged": true,
+    "article_7_apostrophe_count_unchanged": true,
+    "article_8_apostrophe_count_unchanged": true,
+    "article_10_apostrophe_count_unchanged": true,
+    "article_11_apostrophe_count_unchanged": true,
+    "article_13_apostrophe_count_unchanged": true,
+    "article_14_apostrophe_count_unchanged": true,
+    "article_46_apostrophe_count_unchanged": true,
+    "all_25_manual_split_occurrences_preserved": true,
+    "exactly_39_approved_pua_occurrences_processed": true,
+    "exactly_754_approved_trailing_a_removed": true,
+    "exactly_14_approved_split_occurrences_joined": true,
+    "no_approved_target_pua_remain": true,
+    "changed_articles_equal_operation_article_set": true,
+    "no_unapproved_text_ar_changes": true,
+    "unchanged_articles_byte_equivalent_as_records": true
+  },
+  "new_unexpected_audit_warnings": [],
+  "known_remaining_review_warnings": [
+    {
+      "severity": "medium",
+      "issue": "isolated trailing Arabic character remains",
+      "articles": [
+        1122
+      ],
+      "expected_article_1122_only": true
+    },
+    {
+      "severity": "medium",
+      "issue": "suspicious split-word candidates remain diagnostic/manual-review only",
+      "affected_articles": 722,
+      "occurrences": 1461
+    },
+    {
+      "severity": "medium",
+      "issue": "Arabic punctuation anomalies remain unchanged",
+      "spaces_before_punctuation": 1,
+      "repeated_punctuation": 1
+    }
+  ]
+}
