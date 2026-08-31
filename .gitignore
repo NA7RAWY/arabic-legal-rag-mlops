@@ -227,3 +227,4 @@ data/processed/*
 !data/processed/normalization_pass2_analysis.json
 !data/processed/normalization_pass2_log.json
 !data/processed/normalization_audit_clean_v2.json
+.vscode/
