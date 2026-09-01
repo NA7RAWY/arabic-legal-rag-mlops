@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: legal-rag-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-legal_rag}
+      POSTGRES_USER: ${POSTGRES_USER:-legal_rag}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-legal_rag_dev}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: arabic-legal-rag-api:0.1.0
+    container_name: legal-rag-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-legal_rag}
+      POSTGRES_USER: ${POSTGRES_USER:-legal_rag}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-legal_rag_dev}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-intfloat/multilingual-e5-small}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.7-flash}
+      HF_HOME: /home/legal-rag/.cache/huggingface
+    ports:
+      - "8000:8000"
+    volumes:
+      - huggingface_cache:/home/legal-rag/.cache/huggingface
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://localhost:8000/health', timeout=5)
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  postgres_data:
+  huggingface_cache:
