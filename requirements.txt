@@ -1,1 +1,3 @@
+# Module 0 corpus-extraction dependency only.
+# Module 1 application and development dependencies are defined in pyproject.toml.
 pymupdf==1.28.2
