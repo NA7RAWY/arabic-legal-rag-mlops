@@ -93,14 +93,16 @@ def test_chunk_articles_preserves_count_and_order() -> None:
     ]
 
 
+@pytest.mark.skipif(
+    not CANONICAL_CORPUS.is_file(),
+    reason="canonical corpus is a DVC-managed integration fixture",
+)
 def test_chunk_canonical_corpus() -> None:
     articles = load_articles(CANONICAL_CORPUS)
 
     chunks = chunk_articles(articles)
     chunk_ids = [chunk.chunk_id for chunk in chunks]
-    chunk_1022 = next(
-        chunk for chunk in chunks if chunk.article_number == 1022
-    )
+    chunk_1022 = next(chunk for chunk in chunks if chunk.article_number == 1022)
     article_1022 = next(
         article for article in articles if article.article_number == 1022
     )

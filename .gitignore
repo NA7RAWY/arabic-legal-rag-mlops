@@ -236,7 +236,9 @@ data/raw/
 
 # Module 0 processed-data checkpoint: ignore intermediate corpora and audits.
 data/processed/*
+!data/processed/.gitignore
 !data/processed/civil_code_articles_clean_v2.json
+!data/processed/civil_code_articles_clean_v2.json.dvc
 !data/processed/extraction_report.json
 !data/processed/normalization_pass2_analysis.json
 !data/processed/normalization_pass2_log.json
