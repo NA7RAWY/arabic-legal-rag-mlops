@@ -77,10 +77,7 @@ class GeminiGenerator:
 
         from google.genai import types
 
-        prompt = (
-            f"User question:\n{question}\n\n"
-            f"Retrieved legal context:\n{context}"
-        )
+        prompt = f"User question:\n{question}\n\nRetrieved legal context:\n{context}"
         try:
             response = self._get_client().models.generate_content(
                 model=self.model_name,
