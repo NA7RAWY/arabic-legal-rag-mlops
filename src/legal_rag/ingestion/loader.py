@@ -61,7 +61,9 @@ def _parse_article(record: Any, index: int) -> LegalArticle:
 
     for field_name, expected_type in _FIELD_TYPES.items():
         value = record[field_name]
-        if not isinstance(value, expected_type):
+        if not isinstance(value, expected_type) or (
+            expected_type is int and isinstance(value, bool)
+        ):
             raise ValueError(
                 f"Malformed article at index {index}: field {field_name!r} "
                 f"has invalid type {type(value).__name__}"
@@ -85,9 +87,7 @@ def load_articles(path: Path) -> list[LegalArticle]:
         ) from exc
 
     if not isinstance(records, list):
-        raise ValueError(
-            f"Invalid corpus format in {path}: JSON root must be a list"
-        )
+        raise ValueError(f"Invalid corpus format in {path}: JSON root must be a list")
 
     return [_parse_article(record, index) for index, record in enumerate(records)]
 
