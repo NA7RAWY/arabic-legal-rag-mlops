@@ -227,3 +227,18 @@ def test_semantic_search_validates_dimension_and_top_k() -> None:
 
     with pytest.raises(ValueError, match="top_k must be greater than zero"):
         repository.semantic_search([0.0] * 384, top_k=0)
+
+
+def test_repository_uses_validated_alternative_table_name() -> None:
+    cursor = FakeCursor((0,))
+    repository = PostgresChunkRepository(
+        AppConfig(),
+        connection_factory=FakeConnectionFactory(cursor),
+        table_name="legal_chunks_experiment",
+    )
+
+    assert repository.count_chunks() == 0
+    assert "FROM legal_chunks_experiment" in cursor.executed[0][0]
+
+    with pytest.raises(ValueError, match="safe lowercase SQL identifier"):
+        PostgresChunkRepository(AppConfig(), table_name="legal_chunks; DROP TABLE")
