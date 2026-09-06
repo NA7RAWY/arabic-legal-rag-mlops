@@ -33,6 +33,27 @@ class AppConfig:
     gemini_model: str = field(
         default_factory=lambda: os.getenv("GEMINI_MODEL", "gemini-3.7-flash")
     )
+    evaluation_model: str = field(
+        default_factory=lambda: os.getenv("EVALUATION_MODEL", "gemini-3.7-flash")
+    )
+    mlflow_tracking_uri: str = field(
+        default_factory=lambda: os.getenv(
+            "MLFLOW_TRACKING_URI", "http://localhost:5000"
+        )
+    )
+    mlflow_experiment_name: str = field(
+        default_factory=lambda: os.getenv(
+            "MLFLOW_EXPERIMENT_NAME", "arabic-legal-rag-dev"
+        )
+    )
+    mlflow_backend_store_uri: str = field(
+        default_factory=lambda: os.getenv(
+            "MLFLOW_BACKEND_STORE_URI", "sqlite:////mlflow/mlflow.db"
+        )
+    )
+    mlflow_artifact_root: str = field(
+        default_factory=lambda: os.getenv("MLFLOW_ARTIFACT_ROOT", "/mlflow/artifacts")
+    )
     postgres_db: str = field(
         default_factory=lambda: os.getenv("POSTGRES_DB", "legal_rag")
     )
@@ -46,9 +67,7 @@ class AppConfig:
         default_factory=lambda: os.getenv("POSTGRES_HOST", "localhost")
     )
     postgres_port: int = field(default_factory=_postgres_port)
-    corpus_path: Path = Path(
-        "data/processed/civil_code_articles_clean_v2.json"
-    )
+    corpus_path: Path = Path("data/processed/civil_code_articles_clean_v2.json")
 
 
 def get_config() -> AppConfig:

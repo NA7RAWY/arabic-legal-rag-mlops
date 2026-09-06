@@ -11,16 +11,40 @@ dependencies = [
     "anyio>=4.8,<4.10",
     "fastapi>=0.115,<0.116",
     "google-genai",
+    "mlflow-skinny>=3.3,<4",
     "psycopg[binary]",
     "sentence-transformers",
     "uvicorn",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = [
+    "dvc>=3.60,<4",
+    "instructor[google-genai]",
+    "langchain-community>=0.3.31,<0.4",
+    "pre-commit>=4,<5",
+    "pytest>=8",
+    "pytest-cov>=6,<8",
+    "ragas>=0.4.3,<0.5",
+    "ruff>=0.12,<1",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/extract_civil_code.py" = ["UP035"]
+"src/legal_rag/api/app.py" = ["B008"]
+"tests/**/*.py" = ["B011"]
