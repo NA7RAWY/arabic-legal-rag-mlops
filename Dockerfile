@@ -17,14 +17,13 @@ RUN python -m pip install --upgrade pip \
         "anyio>=4.8,<4.10" \
         "fastapi>=0.115,<0.116" \
         google-genai \
+        "mlflow-skinny>=3.3,<4" \
         "psycopg[binary]" \
         sentence-transformers \
         uvicorn
 
 COPY pyproject.toml ./
 COPY src ./src
-COPY data/processed/civil_code_articles_clean_v2.json \
-    ./data/processed/civil_code_articles_clean_v2.json
 
 RUN python -m pip install --no-deps . \
     && mkdir -p /home/legal-rag/.cache/huggingface \

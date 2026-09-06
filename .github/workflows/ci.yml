@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Quality and tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install development dependencies
+        run: python -m pip install -e ".[dev]"
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Ruff format check
+        run: ruff format --check .
+
+      - name: Pre-commit validation
+        run: pre-commit run --all-files
+
+      - name: Tests and coverage
+        run: >-
+          pytest --cov=legal_rag --cov-report=term-missing
+          --cov-fail-under=80 -q
+
+      - name: Verify hooks left no changes
+        run: git diff --check && git diff --exit-code
+
+  docker-build:
+    name: Production image build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build SHA-tagged image
+        run: docker build --tag "legal-rag:${{ github.sha }}" .

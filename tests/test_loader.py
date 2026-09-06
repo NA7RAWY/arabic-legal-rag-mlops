@@ -35,6 +35,10 @@ def _write_json(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False), encoding="utf-8")
 
 
+@pytest.mark.skipif(
+    not CANONICAL_CORPUS.is_file(),
+    reason="canonical corpus is a DVC-managed integration fixture",
+)
 def test_load_canonical_corpus() -> None:
     articles = load_articles(CANONICAL_CORPUS)
     article_numbers = [article.article_number for article in articles]
@@ -101,6 +105,20 @@ def test_incorrect_field_type_raises_value_error(tmp_path: Path) -> None:
     _write_json(corpus_path, [record])
 
     with pytest.raises(ValueError, match=r"field 'article_number'.*invalid type str"):
+        load_articles(corpus_path)
+
+
+@pytest.mark.parametrize("field", ["article_number", "source_page"])
+def test_boolean_is_not_accepted_as_an_integer_field(
+    tmp_path: Path,
+    field: str,
+) -> None:
+    corpus_path = tmp_path / "corpus.json"
+    record = _valid_record()
+    record[field] = True
+    _write_json(corpus_path, [record])
+
+    with pytest.raises(ValueError, match=rf"field '{field}'.*invalid type bool"):
         load_articles(corpus_path)
 
 

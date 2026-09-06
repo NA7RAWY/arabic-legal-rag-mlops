@@ -89,9 +89,7 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
         service: LegalRAGService = Depends(get_rag_service),
     ) -> AskResponse:
         top_k = (
-            active_config.retrieval_top_k
-            if request.top_k is None
-            else request.top_k
+            active_config.retrieval_top_k if request.top_k is None else request.top_k
         )
         logger.info(
             "Received ask request with question length %d and top_k %d",

@@ -129,10 +129,12 @@ Indexing is intentionally explicit and idempotent; API startup never re-indexes 
 python -c "from legal_rag.config import get_config; from legal_rag.ingestion import index_corpus; from legal_rag.rag import SentenceTransformerEmbedder; from legal_rag.storage import PostgresChunkRepository; c=get_config(); print(index_corpus(PostgresChunkRepository(c), SentenceTransformerEmbedder(c.embedding_model), c))"
 ```
 
-The same operation can be run in the application container after the stack is started:
+The same operation can be run explicitly in a one-off application container
+after restoring the DVC data and starting PostgreSQL. The corpus is mounted at
+runtime rather than baked into the production image:
 
 ```bash
-docker compose exec api python -c "from legal_rag.config import get_config; from legal_rag.ingestion import index_corpus; from legal_rag.rag import SentenceTransformerEmbedder; from legal_rag.storage import PostgresChunkRepository; c=get_config(); print(index_corpus(PostgresChunkRepository(c), SentenceTransformerEmbedder(c.embedding_model), c))"
+docker compose run --rm -v "$PWD/data:/app/data:ro" api python -c "from legal_rag.config import get_config; from legal_rag.ingestion import index_corpus; from legal_rag.rag import SentenceTransformerEmbedder; from legal_rag.storage import PostgresChunkRepository; c=get_config(); print(index_corpus(PostgresChunkRepository(c), SentenceTransformerEmbedder(c.embedding_model), c))"
 ```
 
 Re-indexing upserts deterministic `article-N` chunk IDs, so it rebuilds/updates rows rather than duplicating them.
@@ -161,6 +163,32 @@ docker compose ps
 ```
 
 Compose runs the API and PostgreSQL on one network, persists database data in `postgres_data`, and persists downloaded Hugging Face model files in `huggingface_cache`. The E5 model is downloaded on the first retrieval request if the cache is empty.
+
+## MLflow tracking
+
+The local MLflow server uses an isolated SQLite backend and filesystem artifact store in the `mlflow_data` Docker volume. It does not create or modify tables in the legal RAG PostgreSQL database.
+
+Start the stack and open the MLflow UI at [http://localhost:5000](http://localhost:5000):
+
+```bash
+docker compose up -d
+docker compose ps
+curl http://localhost:5000/health
+```
+
+Verify the tracking API from the host environment:
+
+```bash
+python -c "import mlflow; mlflow.set_tracking_uri('http://localhost:5000'); mlflow.set_experiment('arabic-legal-rag-dev'); print([item.name for item in mlflow.search_experiments()])"
+```
+
+Experiment metadata and artifacts persist across container restarts. Evaluation metric names are reserved in the tracking abstraction, but Module 2 does not calculate or invent evaluation values yet.
+
+Create a metadata-only baseline run without invoking retrieval or Gemini:
+
+```bash
+python -m legal_rag.tracking.baseline
+```
 
 ## API
 
@@ -210,9 +238,72 @@ The placeholder article above documents the response contract without claiming a
 
 Tests use fakes and dependency overrides, so the normal suite does not require Docker, PostgreSQL, Hugging Face downloads, or Gemini calls.
 
+### Evaluation dataset
+
+`data/evaluation/legal_rag_eval_v1.json` contains 50 manually curated Arabic
+cases grounded in exact excerpts from the canonical Egyptian Civil Code corpus.
+The loader validates the exact schema, unique IDs and questions, article
+existence, Arabic source availability, and article/excerpt correspondence.
+Inspect its deterministic summary with:
+
+```bash
+python -m legal_rag.evaluation.summary
+```
+
+The 50-case benchmark is the first broad Module 2 evaluation set and can be
+expanded toward 100 cases as additional corpus-grounded coverage is curated.
+The end-to-end runner supports RAGAS metrics, while live scoring remains subject
+to the configured judge provider's availability; metric values are never invented.
+
+### Data versioning with DVC
+
+DVC manages the canonical corpus and the v1 evaluation dataset while Git tracks
+their small `.dvc` pointer files. The JSON corpus remains the source of truth;
+the PostgreSQL vector index can be rebuilt from it.
+
+```bash
+dvc pull       # restore DVC-managed files when a remote becomes available
+dvc status     # compare the workspace with DVC metadata
+dvc repro      # validate the evaluation dataset against the corpus
+```
+
+The `validate_evaluation` stage performs schema and corpus-grounding validation
+and prints a deterministic dataset summary. No DVC remote is configured yet;
+local cache storage is used for Module 2, and a cloud remote can be added later.
+
+## Continuous integration
+
+GitHub Actions runs on pull requests and pushes to `main`. The quality job checks
+Ruff linting and formatting, runs pre-commit, and enforces at least 80% test
+coverage. Tests use fakes and make no live PostgreSQL, MLflow, Hugging Face, or
+Gemini calls.
+
+Because no DVC remote exists yet, a fresh GitHub runner cannot restore the
+canonical corpus or evaluation dataset. Only the three integration checks that
+require those exact files are skipped when DVC outputs are absent; their loader,
+schema, and orchestration behavior remains covered with committed synthetic
+fixtures. Full data validation requires restored outputs and `dvc repro` until a
+remote is configured.
+
+A separate job builds the production image as `legal-rag:<git-sha>`. The image
+does not contain the canonical corpus: runtime serving uses the rebuildable
+PostgreSQL index, while explicit indexing mounts restored data. CI validates the
+image but does not push it; registry selection and credentials belong to the
+future deployment layer.
+
 ```bash
 pytest -q
 ```
+
+### Experimental long-article chunking
+
+The Module 2 comparison keeps the production one-article-per-chunk baseline and
+indexes `split_long_articles` into a separate PostgreSQL table. Based on the
+canonical corpus character-length distribution, the initial experimental
+configuration splits only articles longer than 600 characters into 500-character
+windows with 75-character overlap. This targets the long tail (30 of 1,149
+articles) without fragmenting typical provisions. Retrieval metrics are computed
+at the article level after removing duplicate article results.
 
 ## Current limitations
 

@@ -27,7 +27,5 @@ def get_rag_service() -> LegalRAGService:
     try:
         generator = GeminiGenerator(config)
     except ValueError as exc:
-        raise RAGConfigurationError(
-            "RAG generation service is not configured"
-        ) from exc
+        raise RAGConfigurationError("RAG generation service is not configured") from exc
     return LegalRAGService(retriever, generator)

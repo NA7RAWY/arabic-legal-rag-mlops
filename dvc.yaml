@@ -1,0 +1,10 @@
+stages:
+  validate_evaluation:
+    cmd: python -m legal_rag.evaluation.summary
+    deps:
+    - data/evaluation/legal_rag_eval_v1.json
+    - data/processed/civil_code_articles_clean_v2.json
+    - src/legal_rag/config.py
+    - src/legal_rag/evaluation/dataset.py
+    - src/legal_rag/evaluation/summary.py
+    - src/legal_rag/ingestion/loader.py

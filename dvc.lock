@@ -1,0 +1,29 @@
+schema: '2.0'
+stages:
+  validate_evaluation:
+    cmd: python -m legal_rag.evaluation.summary
+    deps:
+    - path: data/evaluation/legal_rag_eval_v1.json
+      hash: md5
+      md5: 774db557a881c01cb92e195691c11a85
+      size: 76689
+    - path: data/processed/civil_code_articles_clean_v2.json
+      hash: md5
+      md5: 3eeb9e20ca7422ce197d3269afe993a0
+      size: 1328272
+    - path: src/legal_rag/config.py
+      hash: md5
+      md5: d4c0cc3a7357f35fb0807fa8b32f8deb
+      size: 2412
+    - path: src/legal_rag/evaluation/dataset.py
+      hash: md5
+      md5: f72bf498a69e06c9a1bc9fba4828442e
+      size: 7717
+    - path: src/legal_rag/evaluation/summary.py
+      hash: md5
+      md5: c373fe3caad188dfbbbc8cb6f44d99a8
+      size: 1963
+    - path: src/legal_rag/ingestion/loader.py
+      hash: md5
+      md5: 47706b76aeb75f7682a8b987c7eeaeec
+      size: 3226

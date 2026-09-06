@@ -7,9 +7,9 @@ import pytest
 
 from legal_rag.config import AppConfig
 from legal_rag.rag.generator import (
+    SYSTEM_INSTRUCTION,
     GeminiGenerator,
     GenerationError,
-    SYSTEM_INSTRUCTION,
     build_legal_context,
 )
 from legal_rag.storage import RetrievalResult
@@ -86,8 +86,7 @@ def test_gemini_generator_passes_grounded_prompt_and_system_instruction() -> Non
     assert answer == "الإجابة [المادة 148]"
     assert models.calls[0]["model"] == "test-model"
     assert models.calls[0]["contents"] == (
-        "User question:\nما حكم العقد؟\n\n"
-        "Retrieved legal context:\nlegal context"
+        "User question:\nما حكم العقد؟\n\nRetrieved legal context:\nlegal context"
     )
     assert models.calls[0]["config"].system_instruction == SYSTEM_INSTRUCTION
 

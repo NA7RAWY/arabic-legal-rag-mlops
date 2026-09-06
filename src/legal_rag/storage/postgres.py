@@ -1,5 +1,6 @@
 """PostgreSQL persistence for embedded legal chunks."""
 
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
@@ -11,8 +12,10 @@ from legal_rag.ingestion import LegalChunk
 
 EMBEDDING_DIMENSION = 384
 
+_TABLE_NAME_PATTERN = re.compile(r"^[a-z_][a-z0-9_]*$")
+
 _UPSERT_SQL = """
-INSERT INTO legal_chunks (
+INSERT INTO {table_name} (
     chunk_id,
     article_number,
     text,
@@ -57,7 +60,7 @@ SELECT
     chunks.source_page,
     chunks.citation,
     1 - (chunks.embedding <=> query_vector.embedding) AS similarity
-FROM legal_chunks AS chunks
+FROM {table_name} AS chunks
 CROSS JOIN query_vector
 ORDER BY chunks.embedding <=> query_vector.embedding
 LIMIT %s
@@ -89,9 +92,13 @@ class PostgresChunkRepository:
         self,
         config: AppConfig | None = None,
         connection_factory: Callable[..., Any] = psycopg.connect,
+        table_name: str = "legal_chunks",
     ) -> None:
+        if not _TABLE_NAME_PATTERN.fullmatch(table_name):
+            raise ValueError("table_name must be a safe lowercase SQL identifier")
         self.config = config if config is not None else get_config()
         self._connection_factory = connection_factory
+        self.table_name = table_name
 
     def _connect(self) -> Any:
         return self._connection_factory(
@@ -155,7 +162,9 @@ class PostgresChunkRepository:
 
         with self._connect() as connection:
             with connection.cursor() as cursor:
-                cursor.executemany(_UPSERT_SQL, parameters)
+                cursor.executemany(
+                    _UPSERT_SQL.format(table_name=self.table_name), parameters
+                )
         return len(parameters)
 
     def count_chunks(self) -> int:
@@ -163,7 +172,7 @@ class PostgresChunkRepository:
 
         with self._connect() as connection:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT count(*) FROM legal_chunks")
+                cursor.execute(f"SELECT count(*) FROM {self.table_name}")
                 row = cursor.fetchone()
         if row is None:
             raise RuntimeError("PostgreSQL did not return a chunk count")
@@ -175,7 +184,7 @@ class PostgresChunkRepository:
         with self._connect() as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """
+                    f"""
                     SELECT
                         chunk_id,
                         article_number,
@@ -188,7 +197,7 @@ class PostgresChunkRepository:
                         is_repealed,
                         source_page,
                         citation
-                    FROM legal_chunks
+                    FROM {self.table_name}
                     WHERE chunk_id = %s
                     """,
                     (chunk_id,),
@@ -210,10 +219,10 @@ class PostgresChunkRepository:
         vector = "[" + ",".join(str(float(value)) for value in embedding) + "]"
         with self._connect() as connection:
             with connection.cursor() as cursor:
-                cursor.execute(_SEMANTIC_SEARCH_SQL, (vector, top_k))
+                cursor.execute(
+                    _SEMANTIC_SEARCH_SQL.format(table_name=self.table_name),
+                    (vector, top_k),
+                )
                 rows = cursor.fetchall()
 
-        return [
-            RetrievalResult(*row[:-1], similarity=float(row[-1]))
-            for row in rows
-        ]
+        return [RetrievalResult(*row[:-1], similarity=float(row[-1])) for row in rows]

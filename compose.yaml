@@ -38,6 +38,8 @@ services:
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-intfloat/multilingual-e5-small}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.7-flash}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_EXPERIMENT_NAME: ${MLFLOW_EXPERIMENT_NAME:-arabic-legal-rag-dev}
       HF_HOME: /home/legal-rag/.cache/huggingface
     ports:
       - "8000:8000"
@@ -56,6 +58,39 @@ services:
       retries: 10
       start_period: 10s
 
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.16.0
+    container_name: legal-rag-mlflow
+    command:
+      - mlflow
+      - server
+      - --backend-store-uri
+      - ${MLFLOW_BACKEND_STORE_URI:-sqlite:////mlflow/mlflow.db}
+      - --artifacts-destination
+      - ${MLFLOW_ARTIFACT_ROOT:-/mlflow/artifacts}
+      - --serve-artifacts
+      - --host
+      - 0.0.0.0
+      - --port
+      - "5000"
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://localhost:5000/health', timeout=5)
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
 volumes:
   postgres_data:
   huggingface_cache:
+  mlflow_data:
