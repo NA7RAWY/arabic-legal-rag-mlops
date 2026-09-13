@@ -27,6 +27,9 @@ class AppConfig:
         )
     )
     retrieval_top_k: int = 5
+    llm_provider: str = field(
+        default_factory=lambda: os.getenv("LLM_PROVIDER", "gemini")
+    )
     gemini_api_key: str | None = field(
         default_factory=lambda: os.getenv("GEMINI_API_KEY")
     )
@@ -35,6 +38,15 @@ class AppConfig:
     )
     evaluation_model: str = field(
         default_factory=lambda: os.getenv("EVALUATION_MODEL", "gemini-3.7-flash")
+    )
+    vllm_base_url: str = field(
+        default_factory=lambda: os.getenv("VLLM_BASE_URL", "http://localhost:8000/v1")
+    )
+    vllm_model: str = field(
+        default_factory=lambda: os.getenv("VLLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+    )
+    vllm_api_key: str = field(
+        default_factory=lambda: os.getenv("VLLM_API_KEY", "EMPTY")
     )
     mlflow_tracking_uri: str = field(
         default_factory=lambda: os.getenv(

@@ -1,10 +1,12 @@
 """FastAPI application for the Arabic Legal RAG service."""
 
+import json
 import logging
+from collections.abc import Iterator
 
 import psycopg
 from fastapi import Depends, FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from legal_rag.api.dependencies import RAGConfigurationError, get_rag_service
 from legal_rag.api.schemas import (
@@ -15,9 +17,52 @@ from legal_rag.api.schemas import (
 )
 from legal_rag.config import AppConfig, get_config
 from legal_rag.logging_conf import configure_logging
-from legal_rag.rag import GenerationError, LegalRAGService, NoRetrievedContextError
+from legal_rag.rag import (
+    GenerationError,
+    LegalRAGService,
+    LegalRAGStreamResult,
+    NoRetrievedContextError,
+)
 
 logger = logging.getLogger(__name__)
+
+
+def _sse_event(event: str, data: object) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+def _stream_events(result: LegalRAGStreamResult) -> Iterator[str]:
+    chunks = iter(result.chunks)
+    try:
+        first_chunk = next(chunks)
+    except (GenerationError, StopIteration):
+        logger.error("Streaming ask request failed before first provider chunk")
+        yield _sse_event("error", {"detail": "Answer generation provider failed"})
+        return
+
+    sources = [
+        SourceResponse(
+            chunk_id=source.chunk_id,
+            article_number=source.article_number,
+            citation=source.citation,
+            language=source.language,
+            similarity=source.similarity,
+        ).model_dump()
+        for source in result.retrieved_sources
+    ]
+    yield _sse_event(
+        "sources",
+        {"question": result.question, "sources": sources},
+    )
+    yield _sse_event("token", {"text": first_chunk})
+    try:
+        for chunk in chunks:
+            yield _sse_event("token", {"text": chunk})
+    except GenerationError:
+        logger.error("Streaming ask request failed: generation provider error")
+        yield _sse_event("error", {"detail": "Answer generation provider failed"})
+        return
+    yield _sse_event("done", {})
 
 
 def create_app(config: AppConfig | None = None) -> FastAPI:
@@ -116,6 +161,29 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
             len(response.sources),
         )
         return response
+
+    @application.post("/ask/stream")
+    def ask_stream(
+        request: AskRequest,
+        service: LegalRAGService = Depends(get_rag_service),
+    ) -> StreamingResponse:
+        top_k = (
+            active_config.retrieval_top_k if request.top_k is None else request.top_k
+        )
+        logger.info(
+            "Received streaming ask request with question length %d and top_k %d",
+            len(request.question),
+            top_k,
+        )
+        result = service.stream_answer(request.question, top_k=top_k)
+        return StreamingResponse(
+            _stream_events(result),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "X-Accel-Buffering": "no",
+            },
+        )
 
     return application
 

@@ -1,0 +1,2 @@
+# Installed only in the BentoML serving environment, not the baseline API image.
+bentoml==1.4.39

@@ -1,5 +1,8 @@
 """Unit tests for sentence-transformer embedding behavior."""
 
+from concurrent.futures import ThreadPoolExecutor
+from threading import Event, Lock
+
 import pytest
 
 from legal_rag.ingestion import LegalChunk
@@ -117,3 +120,33 @@ def test_embed_chunks_preserves_chunk_order(
 
     assert model.calls == [(["passage: nine", "passage: two"], True)]
     assert vectors == [[0.0, 1.0], [1.0, 2.0]]
+
+
+def test_concurrent_first_use_loads_embedding_model_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    embedder = SentenceTransformerEmbedder("fake-model")
+    model = FakeSentenceTransformer()
+    load_started = Event()
+    release_load = Event()
+    count_lock = Lock()
+    load_count = 0
+
+    def controlled_load() -> FakeSentenceTransformer:
+        nonlocal load_count
+        with count_lock:
+            load_count += 1
+        load_started.set()
+        assert release_load.wait(timeout=2)
+        return model
+
+    monkeypatch.setattr(embedder, "_load_model", controlled_load)
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        first = executor.submit(embedder._get_model)
+        assert load_started.wait(timeout=2)
+        second = executor.submit(embedder._get_model)
+        release_load.set()
+
+    assert first.result() is model
+    assert second.result() is model
+    assert load_count == 1

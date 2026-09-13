@@ -36,8 +36,12 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-intfloat/multilingual-e5-small}
+      LLM_PROVIDER: ${LLM_PROVIDER:-gemini}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.7-flash}
+      VLLM_BASE_URL: ${VLLM_BASE_URL:-http://host.docker.internal:8000/v1}
+      VLLM_MODEL: ${VLLM_MODEL:-Qwen/Qwen2.5-7B-Instruct}
+      VLLM_API_KEY: ${VLLM_API_KEY:-EMPTY}
       MLFLOW_TRACKING_URI: http://mlflow:5000
       MLFLOW_EXPERIMENT_NAME: ${MLFLOW_EXPERIMENT_NAME:-arabic-legal-rag-dev}
       HF_HOME: /home/legal-rag/.cache/huggingface
@@ -45,6 +49,8 @@ services:
       - "8000:8000"
     volumes:
       - huggingface_cache:/home/legal-rag/.cache/huggingface
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test:
         - CMD

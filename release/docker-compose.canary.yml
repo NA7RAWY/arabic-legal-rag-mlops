@@ -1,0 +1,69 @@
+services:
+  stable:
+    build:
+      context: ..
+      dockerfile: release/Dockerfile
+    image: ${STABLE_IMAGE:-legal-rag-bentoml:local}
+    environment: &application_environment
+      POSTGRES_DB: ${POSTGRES_DB:-legal_rag}
+      POSTGRES_USER: ${POSTGRES_USER:-legal_rag}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-legal_rag_dev}
+      POSTGRES_HOST: ${POSTGRES_HOST:-host.docker.internal}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-intfloat/multilingual-e5-small}
+      LLM_PROVIDER: ${LLM_PROVIDER:-gemini}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.7-flash}
+      VLLM_BASE_URL: ${VLLM_BASE_URL:-http://host.docker.internal:8000/v1}
+      VLLM_MODEL: ${VLLM_MODEL:-Qwen/Qwen2.5-7B-Instruct}
+      VLLM_API_KEY: ${VLLM_API_KEY:-EMPTY}
+      DEPLOYMENT_SLOT: stable
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:8001:3000"
+    volumes:
+      - huggingface_cache:/home/legal-rag/.cache/huggingface
+    healthcheck: &application_healthcheck
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://localhost:3000/health', timeout=5)
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  candidate:
+    build:
+      context: ..
+      dockerfile: release/Dockerfile
+    image: ${CANDIDATE_IMAGE:-legal-rag-bentoml:local}
+    environment:
+      <<: *application_environment
+      DEPLOYMENT_SLOT: candidate
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:8002:3000"
+    volumes:
+      - huggingface_cache:/home/legal-rag/.cache/huggingface
+    healthcheck: *application_healthcheck
+
+  nginx:
+    image: nginx:1.27-alpine
+    depends_on:
+      stable:
+        condition: service_started
+      candidate:
+        condition: service_started
+    ports:
+      - "8080:80"
+    volumes:
+      - ${NGINX_CONFIG:-./nginx.conf}:/etc/nginx/nginx.conf:ro
+
+volumes:
+  huggingface_cache:

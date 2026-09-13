@@ -1,5 +1,6 @@
 """Sentence-transformer embedding support for legal text."""
 
+from threading import Lock
 from typing import Any, Protocol, cast
 
 from legal_rag.config import get_config
@@ -21,6 +22,7 @@ class SentenceTransformerEmbedder:
     def __init__(self, model_name: str | None = None) -> None:
         self.model_name = model_name or get_config().embedding_model
         self._model: _SentenceEncoder | None = None
+        self._model_lock = Lock()
 
     def _load_model(self) -> _SentenceEncoder:
         from sentence_transformers import SentenceTransformer
@@ -29,7 +31,9 @@ class SentenceTransformerEmbedder:
 
     def _get_model(self) -> _SentenceEncoder:
         if self._model is None:
-            self._model = self._load_model()
+            with self._model_lock:
+                if self._model is None:
+                    self._model = self._load_model()
         return self._model
 
     @staticmethod

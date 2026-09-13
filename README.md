@@ -1,92 +1,67 @@
-# Arabic Legal RAG
+# Arabic Legal RAG MLOps
 
-A portfolio-oriented retrieval-augmented generation service for asking questions about the Egyptian Civil Code in Arabic. The project combines a validated legal corpus, local multilingual embeddings, PostgreSQL/pgvector semantic search, grounded Gemini generation, and a FastAPI interface.
+An Arabic legal-document retrieval-augmented generation system grounded in the
+Egyptian Civil Code. It retrieves relevant provisions from PostgreSQL/pgvector,
+generates an informational answer through a configurable LLM provider, and
+returns traceable legal sources. The canonical JSON corpus remains the source of
+truth; the vector database is a rebuildable serving index.
 
-Module 1 is a working baseline, not a claim of production or legal-advice readiness.
+This is a portfolio and engineering baseline, not professional legal advice or
+a claim of complete production readiness.
 
-## Problem statement
-
-Legal questions require traceable answers grounded in authoritative text. Generic language models can hallucinate provisions or citations, while keyword search can miss semantically related Arabic phrasing. This project retrieves relevant Civil Code articles first and supplies only that context to the answer generator.
-
-The canonical JSON corpus is the source of truth. PostgreSQL is a rebuildable vector index, not the authoritative corpus.
-
-## Module 1 scope
-
-- Typed corpus loading and validation
-- One legal article = one chunk baseline
-- Arabic text with English fallback where Arabic is unavailable
-- Local `intfloat/multilingual-e5-small` embeddings
-- PostgreSQL 16 with pgvector and idempotent chunk upserts
-- Cosine-similarity retrieval with configurable `top_k`
-- Provider-independent generation interface, currently implemented with Gemini
-- FastAPI `/health` and `/ask` endpoints
-- Unit/API tests and a local Docker Compose stack
-
-Authentication, user data, conversations, evaluation pipelines, monitoring, deployment automation, and a frontend are outside Module 1.
-
-## Architecture
+## Architecture and status
 
 ```text
-Egyptian Civil Code JSON
-        |
-        v
-      Loader
-        |
-        v
-Article-level Chunker
-        |
-        v
-multilingual-e5-small (local embeddings)
-        |
-        v
-PostgreSQL + pgvector
-        |
-        v
-     Retriever
-        |
-        v
-Gemini via LLM provider abstraction
-        |
-        v
-      FastAPI
+Egyptian Civil Code JSON (DVC)
+  -> validated loader
+  -> one article per chunk
+  -> multilingual-e5-small embeddings (local)
+  -> PostgreSQL + pgvector
+  -> semantic retriever (top_k=5)
+  -> Gemini or OpenAI-compatible vLLM
+  -> LegalRAGService
+  -> FastAPI baseline / BentoML service
+  -> nginx weighted canary
 ```
 
-Retrieved article number, citation, language, and text are passed to Gemini in a deterministic context format. The prompt restricts generation to that context and asks for cited, concise, informational answers.
+- Module 0: corpus extraction, normalization, and audit artifacts.
+- Module 1: loader, indexing, retrieval, grounded generation, API, and Docker.
+- Module 2: MLflow experiments, 50-case evaluation, RAGAS integration, DVC,
+  quality gates, and CI.
+- Module 3: Airflow orchestration, BentoML, optional vLLM, HTTP/SSE streaming,
+  Locust scenarios, bounded provider retries, canary release, and Docker Hub
+  publishing automation.
 
-## Tech stack
+The production defaults remain one legal article per chunk and `top_k=5`.
+Gemini remains the default generator; vLLM is an optional OpenAI-compatible
+backend.
 
-- Python 3.12 and setuptools with a `src` layout
-- FastAPI and Uvicorn
-- Sentence Transformers with multilingual E5
-- PostgreSQL 16 and pgvector
-- Psycopg 3
-- Google Gen AI SDK
-- Pytest
-- Docker and Docker Compose
+## Core stack
 
-## Project structure
+Python 3.12, FastAPI, BentoML, Sentence Transformers
+(`intfloat/multilingual-e5-small`), PostgreSQL/pgvector, Psycopg, Gemini,
+OpenAI-compatible vLLM HTTP APIs, MLflow, DVC, Airflow, Locust, nginx, Docker
+Compose, Ruff, pytest, pre-commit, and GitHub Actions.
+
+## Repository layout
 
 ```text
-.
-├── data/processed/                     # Canonical corpus and Module 0 artifacts
-├── docker/postgres/init.sql            # pgvector extension and legal_chunks schema
-├── scripts/extract_civil_code.py       # Module 0 extraction workflow
-├── src/legal_rag/
-│   ├── api/                            # FastAPI app, schemas, dependency wiring
-│   ├── ingestion/                      # Loader, chunker, indexing orchestration
-│   ├── rag/                            # Embedder, retriever, generator, RAG service
-│   ├── storage/                        # Parameterized PostgreSQL repository
-│   ├── config.py
-│   └── logging_conf.py
-├── tests/
-├── compose.yaml
-├── Dockerfile
-└── pyproject.toml
+src/legal_rag/        application, ingestion, retrieval, generation, evaluation
+data/                 DVC-managed corpus/evaluation data and Module 0 audits
+docker/               PostgreSQL initialization
+orchestration/dags/   manual Airflow maintenance/evaluation DAG
+serving/              isolated BentoML dependency
+loadtest/             controlled target and Locust scenarios
+release/              BentoML image, nginx canary, rollback configuration
+docs/                 focused serving, streaming, load, and release guides
+tests/                unit, API, orchestration, and static configuration tests
+.github/workflows/    CI quality gates and Docker Hub publishing
 ```
 
-## Setup
+## Prerequisites and setup
 
-Requirements: Python 3.12+, Docker with Compose, and a Gemini API key for answer generation.
+Install Python 3.12+, Docker with Compose, Git, and DVC. Airflow, BentoML, and
+Locust are deliberately isolated from the core runtime.
 
 ```bash
 python -m venv .venv
@@ -96,230 +71,223 @@ python -m pip install -e ".[dev]"
 cp .env.example .env
 ```
 
-Set a real `GEMINI_API_KEY` only in the ignored local `.env` file or your shell. Never commit API keys or production credentials.
-Docker Compose reads `.env` automatically. For host-based commands, export the file into the current shell first (for example, `set -a; source .env; set +a`).
+Set credentials only in the ignored `.env` file, the shell environment, or a
+deployment secret store. Never commit real API keys or passwords.
 
-### Environment variables
+Important environment variables include:
 
-| Variable | Development default/purpose |
-|---|---|
-| `POSTGRES_DB` | `legal_rag` |
-| `POSTGRES_USER` | `legal_rag` |
-| `POSTGRES_PASSWORD` | Local development credential; replace outside local use |
-| `POSTGRES_HOST` | `localhost` on the host; Compose overrides it to `postgres` |
-| `POSTGRES_PORT` | `5432` |
-| `EMBEDDING_MODEL` | `intfloat/multilingual-e5-small` |
-| `GEMINI_API_KEY` | Required for `/ask`; no real default |
-| `GEMINI_MODEL` | Configurable Gemini model name |
+- PostgreSQL: `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`,
+  `POSTGRES_HOST`, `POSTGRES_PORT`
+- Generation: `LLM_PROVIDER` (`gemini` by default), `GEMINI_API_KEY`,
+  `GEMINI_MODEL`
+- Optional vLLM: `VLLM_BASE_URL`, `VLLM_MODEL`, `VLLM_API_KEY`
+- Tracking: `MLFLOW_TRACKING_URI`, `MLFLOW_EXPERIMENT_NAME`
+- Evaluation judge: `EVALUATION_MODEL`
 
-## PostgreSQL and corpus indexing
+See `.env.example` for development-safe placeholders and defaults.
 
-Start PostgreSQL and wait for it to become healthy:
+## Data, PostgreSQL, MLflow, and indexing
+
+The canonical corpus and 50-case evaluation dataset are DVC-managed:
 
 ```bash
-docker compose up -d postgres
+dvc status
+dvc checkout        # restore from an existing local DVC cache
+dvc repro           # run deterministic dataset validation/summary
+```
+
+No durable shared DVC remote is configured. Consequently `dvc pull` and full
+fresh-clone reproduction require a remote to be configured later.
+
+Start only the local stateful services:
+
+```bash
+docker compose up -d postgres mlflow
 docker compose ps
 ```
 
-The initialization script enables pgvector and creates `legal_chunks` with a `vector(384)` embedding column. It only runs when PostgreSQL initializes an empty data volume.
+MLflow is available at `http://localhost:5000`. Its SQLite backend and artifacts
+use an isolated Docker volume and do not modify the legal application tables.
 
-Indexing is intentionally explicit and idempotent; API startup never re-indexes automatically. With the host virtual environment and `POSTGRES_HOST=localhost`:
+Indexing is explicit and idempotent; API startup never rebuilds the database:
 
 ```bash
 python -c "from legal_rag.config import get_config; from legal_rag.ingestion import index_corpus; from legal_rag.rag import SentenceTransformerEmbedder; from legal_rag.storage import PostgresChunkRepository; c=get_config(); print(index_corpus(PostgresChunkRepository(c), SentenceTransformerEmbedder(c.embedding_model), c))"
 ```
 
-The same operation can be run explicitly in a one-off application container
-after restoring the DVC data and starting PostgreSQL. The corpus is mounted at
-runtime rather than baked into the production image:
+The indexed `legal_chunks` table contains 384-dimensional vectors. Deterministic
+chunk IDs make re-indexing an upsert rather than a duplicate insert.
+
+## Serving
+
+Run the FastAPI baseline:
 
 ```bash
-docker compose run --rm -v "$PWD/data:/app/data:ro" api python -c "from legal_rag.config import get_config; from legal_rag.ingestion import index_corpus; from legal_rag.rag import SentenceTransformerEmbedder; from legal_rag.storage import PostgresChunkRepository; c=get_config(); print(index_corpus(PostgresChunkRepository(c), SentenceTransformerEmbedder(c.embedding_model), c))"
-```
-
-Re-indexing upserts deterministic `article-N` chunk IDs, so it rebuilds/updates rows rather than duplicating them.
-
-## Running locally
-
-Start PostgreSQL, then run the API from the host:
-
-```bash
-docker compose up -d postgres
 uvicorn legal_rag.api.app:app --host 127.0.0.1 --port 8000
 ```
 
-For an already cached embedding model, optional offline mode is:
+Or install the isolated BentoML dependency and mount the same FastAPI application:
 
 ```bash
-HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 uvicorn legal_rag.api.app:app --host 127.0.0.1 --port 8000
+python -m pip install -r serving/requirements.txt
+bentoml serve legal_rag.serving.service:LegalRAGBentoService \
+  --host 0.0.0.0 --port 3000
 ```
 
-## Running with Docker Compose
+Endpoints:
+
+- `GET /health`: lightweight; does not initialize E5, PostgreSQL, or a provider.
+- `POST /ask`: JSON request/response with answer and concise sources.
+- `POST /ask/stream`: Server-Sent Events (SSE), ordered
+  `sources -> token... -> done` on success.
 
 ```bash
-docker compose build
-docker compose up -d
-docker compose ps
-```
+curl http://127.0.0.1:8000/health
 
-Compose runs the API and PostgreSQL on one network, persists database data in `postgres_data`, and persists downloaded Hugging Face model files in `huggingface_cache`. The E5 model is downloaded on the first retrieval request if the cache is empty.
+curl -X POST http://127.0.0.1:8000/ask \
+  -H 'Content-Type: application/json' \
+  -d '{"question":"متى يكون الشخص مسؤولاً عن التعويض؟","top_k":5}'
 
-## MLflow tracking
-
-The local MLflow server uses an isolated SQLite backend and filesystem artifact store in the `mlflow_data` Docker volume. It does not create or modify tables in the legal RAG PostgreSQL database.
-
-Start the stack and open the MLflow UI at [http://localhost:5000](http://localhost:5000):
-
-```bash
-docker compose up -d
-docker compose ps
-curl http://localhost:5000/health
-```
-
-Verify the tracking API from the host environment:
-
-```bash
-python -c "import mlflow; mlflow.set_tracking_uri('http://localhost:5000'); mlflow.set_experiment('arabic-legal-rag-dev'); print([item.name for item in mlflow.search_experiments()])"
-```
-
-Experiment metadata and artifacts persist across container restarts. Evaluation metric names are reserved in the tracking abstraction, but Module 2 does not calculate or invent evaluation values yet.
-
-Create a metadata-only baseline run without invoking retrieval or Gemini:
-
-```bash
-python -m legal_rag.tracking.baseline
-```
-
-## API
-
-Interactive Swagger documentation: [http://localhost:8000/docs](http://localhost:8000/docs)
-
-### `GET /health`
-
-Lightweight process health check. It does not initialize embeddings or call PostgreSQL or Gemini.
-
-```bash
-curl http://localhost:8000/health
-```
-
-```json
-{"status":"ok","app":"Arabic Legal RAG","version":"0.1.0"}
-```
-
-### `POST /ask`
-
-```bash
-curl -X POST http://localhost:8000/ask \
+curl --no-buffer -X POST http://127.0.0.1:8000/ask/stream \
   -H 'Content-Type: application/json' \
   -d '{"question":"متى يكون الشخص مسؤولاً عن التعويض؟","top_k":5}'
 ```
 
-Example response shape (answer and ranked articles depend on retrieval and the provider response):
+Streaming buffers the first provider chunk before exposing sources. Retryable
+Gemini failures can use bounded backoff before that commit point. After any SSE
+event is visible, generation is not restarted; a sanitized `error` event reports
+failure without duplicating text. See [HTTP streaming](docs/http_streaming.md)
+and [BentoML serving](docs/bentoml_serving.md).
 
-```json
-{
-  "question": "متى يكون الشخص مسؤولاً عن التعويض؟",
-  "answer": "إجابة عربية مستندة إلى المواد القانونية المسترجعة...",
-  "sources": [
-    {
-      "chunk_id": "article-N",
-      "article_number": 0,
-      "citation": "Egyptian Civil Code, Article N",
-      "language": "ar",
-      "similarity": 0.82
-    }
-  ]
-}
-```
+## Optional vLLM backend
 
-The placeholder article above documents the response contract without claiming a fixed retrieval result.
-
-## Testing
-
-Tests use fakes and dependency overrides, so the normal suite does not require Docker, PostgreSQL, Hugging Face downloads, or Gemini calls.
-
-### Evaluation dataset
-
-`data/evaluation/legal_rag_eval_v1.json` contains 50 manually curated Arabic
-cases grounded in exact excerpts from the canonical Egyptian Civil Code corpus.
-The loader validates the exact schema, unique IDs and questions, article
-existence, Arabic source availability, and article/excerpt correspondence.
-Inspect its deterministic summary with:
+The application does not install the vLLM server package. In a suitable GPU
+environment, an example deployment is:
 
 ```bash
-python -m legal_rag.evaluation.summary
+vllm serve Qwen/Qwen2.5-7B-Instruct \
+  --host 0.0.0.0 --port 8000 --max-model-len 8192
+
+export LLM_PROVIDER=vllm
+export VLLM_BASE_URL=http://localhost:8000/v1
+export VLLM_MODEL=Qwen/Qwen2.5-7B-Instruct
+export VLLM_API_KEY=EMPTY
 ```
 
-The 50-case benchmark is the first broad Module 2 evaluation set and can be
-expanded toward 100 cases as additional corpus-grounded coverage is curated.
-The end-to-end runner supports RAGAS metrics, while live scoring remains subject
-to the configured judge provider's availability; metric values are never invented.
+No representative 7B model benchmark was run on the current CPU-only machine.
+See [vLLM serving](docs/vllm_serving.md).
 
-### Data versioning with DVC
+## Airflow orchestration
 
-DVC manages the canonical corpus and the v1 evaluation dataset while Git tracks
-their small `.dvc` pointer files. The JSON corpus remains the source of truth;
-the PostgreSQL vector index can be rebuilt from it.
+Airflow coordinates existing validation, indexing, and evaluation entrypoints;
+it does not implement those operations itself. Install it separately and point
+Airflow at the repository DAG:
 
 ```bash
-dvc pull       # restore DVC-managed files when a remote becomes available
-dvc status     # compare the workspace with DVC metadata
-dvc repro      # validate the evaluation dataset against the corpus
+python -m pip install -r orchestration/requirements.txt
+export AIRFLOW_HOME="$PWD/.airflow"
+export AIRFLOW__CORE__DAGS_FOLDER="$PWD/orchestration/dags"
+airflow db migrate
+airflow standalone
 ```
 
-The `validate_evaluation` stage performs schema and corpus-grounding validation
-and prints a deterministic dataset summary. No DVC remote is configured yet;
-local cache storage is used for Module 2, and a cloud remote can be added later.
-
-## Continuous integration
-
-GitHub Actions runs on pull requests and pushes to `main`. The quality job checks
-Ruff linting and formatting, runs pre-commit, and enforces at least 80% test
-coverage. Tests use fakes and make no live PostgreSQL, MLflow, Hugging Face, or
-Gemini calls.
-
-Because no DVC remote exists yet, a fresh GitHub runner cannot restore the
-canonical corpus or evaluation dataset. Only the three integration checks that
-require those exact files are skipped when DVC outputs are absent; their loader,
-schema, and orchestration behavior remains covered with committed synthetic
-fixtures. Full data validation requires restored outputs and `dvc repro` until a
-remote is configured.
-
-A separate job builds the production image as `legal-rag:<git-sha>`. The image
-does not contain the canonical corpus: runtime serving uses the rebuildable
-PostgreSQL index, while explicit indexing mounts restored data. CI validates the
-image but does not push it; registry selection and credentials belong to the
-future deployment layer.
+Then, in another shell with the same `AIRFLOW_HOME` and DAG-folder settings:
 
 ```bash
-pytest -q
+airflow dags trigger legal_rag_pipeline
 ```
 
-### Experimental long-article chunking
+The DAG is manual (`schedule=None`). Live RAG/RAGAS evaluation is skipped unless
+`ENABLE_LIVE_RAG_EVALUATION=true` is explicitly set, protecting provider quota.
+See [inference and orchestration patterns](docs/inference_patterns.md).
 
-The Module 2 comparison keeps the production one-article-per-chunk baseline and
-indexes `split_long_articles` into a separate PostgreSQL table. Based on the
-canonical corpus character-length distribution, the initial experimental
-configuration splits only articles longer than 600 characters into 500-character
-windows with 75-character overlap. This targets the long tail (30 of 1,149
-articles) without fragmenting typical provisions. Retrieval metrics are computed
-at the article level after removing duplicate article results.
+## Load testing
 
-## Current limitations
+The controlled mode replaces only the `LegalRAGService` dependency and exercises
+the real API validation, serialization, error handling, and SSE path without E5,
+PostgreSQL, Gemini, or vLLM:
 
-- Article-level chunks are a baseline and may be coarse for long provisions.
-- Retrieval has no reranker, hybrid keyword search, or formal quality evaluation yet.
-- The API is synchronous and has no authentication, rate limiting, or request persistence.
-- First containerized retrieval is slower while the embedding model downloads.
-- Gemini availability and quotas are external dependencies.
-- Answers are informational and are not professional legal advice.
+```bash
+python -m pip install -r loadtest/requirements.txt
+uvicorn loadtest.controlled_app:app --host 127.0.0.1 --port 8000
+locust -f loadtest/locustfile.py --host http://127.0.0.1:8000 \
+  --headless --users 5 --spawn-rate 1 --run-time 30s
+```
 
-## Future MLOps roadmap
+For an optional real-provider run, point the same Locust file at a normally
+configured service. This can consume Gemini quota and is affected by network,
+provider, database, cold-start, model, and GPU behavior; it is never run by CI:
 
-- Versioned ingestion and reproducible index builds
-- Retrieval and grounded-answer evaluation datasets and metrics
-- Hybrid retrieval, reranking, and chunking experiments
-- CI quality gates, container scanning, and automated deployment
-- Observability for latency, failures, retrieval quality, and model usage
-- Model/prompt versioning and controlled provider comparison
-- Production secrets management, authentication, rate limiting, and resilience
+```bash
+locust -f loadtest/locustfile.py --host http://127.0.0.1:3000
+```
+
+The reported streaming first-event latency measures the first non-empty SSE line
+seen by the HTTP client, not true model/GPU time-to-first-token. Controlled
+results are serving-layer measurements, not model throughput. See
+[load testing](docs/load_testing.md).
+
+## Canary release and rollback
+
+The local canary runs stable and candidate BentoML containers behind nginx with
+90/10 weighted request routing. It is a canary, not sticky A/B assignment or a
+multi-environment blue/green deployment:
+
+```bash
+docker compose -f release/docker-compose.canary.yml up -d --build
+curl http://127.0.0.1:8080/health
+```
+
+Rollback selects `release/nginx.stable.conf` and recreates only nginx. Promotion,
+health interpretation, immutable `STABLE_IMAGE`/`CANDIDATE_IMAGE` selection, and
+exact commands are documented in [the canary guide](release/README.md).
+
+## CI and Docker Hub publishing
+
+Pull requests run Ruff, formatting, pre-commit, pytest with an 80% coverage gate,
+and Docker build validation. They never log in to Docker Hub or push images.
+After the same gates pass, `main` pushes publish `main` and `sha-<short-sha>`;
+semantic tags such as `v0.3.0` publish `v0.3.0`, `0.3.0`, the SHA tag, and
+`latest`.
+
+Required GitHub settings:
+
+- Secret `DOCKERHUB_USERNAME`
+- Secret `DOCKERHUB_TOKEN`
+- Variable `DOCKERHUB_REPOSITORY` (configured as `arabic-legal-rag`)
+
+Published BentoML images feed the stable/candidate canary through immutable
+tags. See [Docker publishing](docs/docker_publishing.md). Build locally without
+pushing:
+
+```bash
+docker build -f release/Dockerfile -t arabic-legal-rag:module3-test .
+```
+
+## Quality checks
+
+```bash
+ruff check .
+ruff format --check .
+pre-commit run --all-files
+pytest
+pytest --cov=legal_rag --cov-report=term-missing --cov-fail-under=80
+git diff --check
+```
+
+Tests use fakes/mocks for external services. Data-dependent integration tests are
+skipped on fresh CI runners until a DVC remote can restore canonical outputs.
+
+## Known limitations
+
+- No durable shared DVC remote; fresh-clone corpus restoration is incomplete.
+- Module 0 extraction still depends on availability of its source input; the
+  normalized canonical corpus and audit artifacts are versioned separately.
+- Live RAGAS scoring depends on Gemini judge availability and quota; no missing
+  metric values are fabricated.
+- Gemini is an external network/quota dependency despite bounded 429/5xx retries.
+- Current local hardware cannot represent production 7B vLLM throughput.
+- The single-machine nginx canary has one failure domain and no automated
+  metric-driven promotion.
+- No authentication, authorization, rate limiting, request persistence, or
+  production secrets manager is included yet.
