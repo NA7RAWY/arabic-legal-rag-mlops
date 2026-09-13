@@ -1,5 +1,6 @@
 """End-to-end retrieval-augmented generation orchestration."""
 
+from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -25,6 +26,15 @@ class LegalRAGResult:
 
     question: str
     answer: str
+    retrieved_sources: tuple[RetrievalResult, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class LegalRAGStreamResult:
+    """A grounded answer stream and the legal sources used to produce it."""
+
+    question: str
+    chunks: Iterator[str]
     retrieved_sources: tuple[RetrievalResult, ...]
 
 
@@ -58,5 +68,30 @@ class LegalRAGService:
         return LegalRAGResult(
             question=question,
             answer=answer,
+            retrieved_sources=tuple(sources),
+        )
+
+    def stream_answer(
+        self,
+        question: str,
+        top_k: int | None = None,
+    ) -> LegalRAGStreamResult:
+        """Retrieve once and return a provider-backed grounded answer stream."""
+
+        if not question.strip():
+            raise ValueError("Question must not be empty or whitespace-only")
+        if top_k is not None and top_k <= 0:
+            raise ValueError("top_k must be greater than zero")
+
+        sources = self.retriever.search(question, top_k=top_k)
+        if not sources:
+            raise NoRetrievedContextError(
+                "No legal context was retrieved for the question"
+            )
+        context = build_legal_context(sources)
+        chunks = self.generator.stream_generate(question, context)
+        return LegalRAGStreamResult(
+            question=question,
+            chunks=chunks,
             retrieved_sources=tuple(sources),
         )

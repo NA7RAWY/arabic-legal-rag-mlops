@@ -1,5 +1,7 @@
 """Unit tests for RAG service orchestration."""
 
+from collections.abc import Iterator
+
 import pytest
 
 from legal_rag.rag import LegalRAGService, NoRetrievedContextError
@@ -39,9 +41,15 @@ class FakeRetriever:
 
 
 class FakeGenerator:
-    def __init__(self, answer: str = "Grounded answer") -> None:
+    def __init__(
+        self,
+        answer: str = "Grounded answer",
+        chunks: tuple[str, ...] = ("Grounded ", "answer"),
+    ) -> None:
         self.answer = answer
+        self.chunks = chunks
         self.calls: list[tuple[str, str]] = []
+        self.stream_calls: list[tuple[str, str]] = []
         self.error: Exception | None = None
 
     def generate(self, question: str, context: str) -> str:
@@ -49,6 +57,12 @@ class FakeGenerator:
         if self.error is not None:
             raise self.error
         return self.answer
+
+    def stream_generate(self, question: str, context: str) -> Iterator[str]:
+        self.stream_calls.append((question, context))
+        if self.error is not None:
+            raise self.error
+        return iter(self.chunks)
 
 
 def test_rag_service_orchestrates_and_preserves_sources() -> None:
@@ -111,3 +125,20 @@ def test_rag_service_propagates_generator_failure() -> None:
         service.answer("question")
 
     assert generator.calls == [("question", build_legal_context([source]))]
+
+
+def test_rag_service_streams_with_one_retrieval_and_preserves_sources() -> None:
+    sources = [_result(148, 0.9), _result(149, 0.8)]
+    retriever = FakeRetriever(sources)
+    generator = FakeGenerator(chunks=("one", "two"))
+    service = LegalRAGService(retriever, generator)
+
+    result = service.stream_answer("What governs contracts?", top_k=2)
+
+    assert retriever.calls == [("What governs contracts?", 2)]
+    assert generator.stream_calls == [
+        ("What governs contracts?", build_legal_context(sources))
+    ]
+    assert list(result.chunks) == ["one", "two"]
+    assert result.retrieved_sources == tuple(sources)
+    assert retriever.calls == [("What governs contracts?", 2)]

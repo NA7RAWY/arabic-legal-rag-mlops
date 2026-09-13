@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Production-oriented Arabic Legal RAG service for querying the Egyptian Civil Code"
 requires-python = ">=3.12"
 dependencies = [
-    "anyio>=4.8,<4.10",
+    "anyio>=4.10,<5",
     "fastapi>=0.115,<0.116",
     "google-genai",
     "mlflow-skinny>=3.3,<4",

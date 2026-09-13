@@ -1,0 +1,2 @@
+# Installed only in the Airflow orchestration environment, not the API image.
+apache-airflow>=2.10,<3

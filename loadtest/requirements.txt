@@ -1,0 +1,2 @@
+# Installed only for load generation, not in the application runtime.
+locust==2.46.5

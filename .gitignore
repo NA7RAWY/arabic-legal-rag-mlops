@@ -154,6 +154,11 @@ activemq-data/
 !.env.example
 .envrc
 .venv/
+.venv-*/
+.airflow/
+airflow.cfg
+airflow.db
+standalone_admin_password.txt
 env/
 venv/
 ENV/
@@ -223,6 +228,10 @@ tempCodeRunnerFile.py
 .huggingface/
 huggingface_cache/
 models/
+mlruns/
+mlartifacts/
+locust_*.csv
+locust_*.html
 
 # Marimo
 marimo/_static/
