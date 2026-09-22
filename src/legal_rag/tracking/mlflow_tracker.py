@@ -35,6 +35,8 @@ class RAGEvaluationMetric(StrEnum):
     RAGAS_ANSWER_RELEVANCY = "ragas_answer_relevancy"
     RAGAS_CONTEXT_RECALL = "ragas_context_recall"
     RAGAS_CONTEXT_PRECISION = "ragas_context_precision"
+    EVALUATION_SUCCESSFUL_CASES = "evaluation_successful_cases"
+    EVALUATION_FAILED_CASES = "evaluation_failed_cases"
 
 
 @dataclass(frozen=True, slots=True)

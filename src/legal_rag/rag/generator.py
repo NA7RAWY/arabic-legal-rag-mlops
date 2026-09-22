@@ -3,6 +3,7 @@
 import json
 import logging
 from collections.abc import Callable, Iterator
+from dataclasses import dataclass
 from time import sleep
 from typing import Any, Protocol
 from urllib.request import Request, urlopen
@@ -32,6 +33,70 @@ class LLMGenerator(Protocol):
 
 class GenerationError(RuntimeError):
     """Raised when an LLM provider cannot generate an answer."""
+
+
+@dataclass(frozen=True, slots=True)
+class LLMUsage:
+    """Authoritative token counts returned by an LLM provider."""
+
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    total_tokens: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class GenerationResult:
+    """Generated text with optional authoritative provider usage."""
+
+    text: str
+    usage: LLMUsage | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class GenerationChunk:
+    """One streamed text delta and/or a provider usage snapshot."""
+
+    text: str = ""
+    usage: LLMUsage | None = None
+
+
+def _usage_value(value: object) -> int | None:
+    return (
+        value
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0
+        else None
+    )
+
+
+def _gemini_usage(response: Any) -> LLMUsage | None:
+    metadata = getattr(response, "usage_metadata", None)
+    if metadata is None:
+        return None
+    usage = LLMUsage(
+        input_tokens=_usage_value(getattr(metadata, "prompt_token_count", None)),
+        output_tokens=_usage_value(getattr(metadata, "candidates_token_count", None)),
+        total_tokens=_usage_value(getattr(metadata, "total_token_count", None)),
+    )
+    return usage if _has_usage(usage) else None
+
+
+def _openai_usage(payload: dict[str, Any]) -> LLMUsage | None:
+    metadata = payload.get("usage")
+    if not isinstance(metadata, dict):
+        return None
+    usage = LLMUsage(
+        input_tokens=_usage_value(metadata.get("prompt_tokens")),
+        output_tokens=_usage_value(metadata.get("completion_tokens")),
+        total_tokens=_usage_value(metadata.get("total_tokens")),
+    )
+    return usage if _has_usage(usage) else None
+
+
+def _has_usage(usage: LLMUsage) -> bool:
+    return any(
+        value is not None
+        for value in (usage.input_tokens, usage.output_tokens, usage.total_tokens)
+    )
 
 
 def build_generation_prompt(question: str, context: str) -> str:
@@ -118,6 +183,11 @@ class GeminiGenerator:
     def generate(self, question: str, context: str) -> str:
         """Generate an answer grounded only in the supplied legal context."""
 
+        return self.generate_with_usage(question, context).text
+
+    def generate_with_usage(self, question: str, context: str) -> GenerationResult:
+        """Generate text and retain official Gemini response usage metadata."""
+
         from google.genai import types
 
         prompt = build_generation_prompt(question, context)
@@ -141,10 +211,19 @@ class GeminiGenerator:
 
         if not answer or not answer.strip():
             raise GenerationError("Gemini returned an empty response")
-        return answer.strip()
+        return GenerationResult(answer.strip(), _gemini_usage(response))
 
     def stream_generate(self, question: str, context: str) -> Iterator[str]:
         """Yield grounded Gemini response chunks as they arrive."""
+
+        for chunk in self.stream_generate_with_usage(question, context):
+            if chunk.text:
+                yield chunk.text
+
+    def stream_generate_with_usage(
+        self, question: str, context: str
+    ) -> Iterator[GenerationChunk]:
+        """Yield Gemini deltas and authoritative cumulative usage snapshots."""
 
         from google.genai import types
 
@@ -161,9 +240,11 @@ class GeminiGenerator:
                 )
                 for response in responses:
                     text = response.text
+                    usage = _gemini_usage(response)
                     if text:
                         yielded = True
-                        yield text
+                    if text or usage is not None:
+                        yield GenerationChunk(text=text or "", usage=usage)
                 if not yielded:
                     raise GenerationError("Gemini returned an empty response stream")
                 return
@@ -220,6 +301,8 @@ class OpenAICompatibleGenerator:
             ],
             "stream": stream,
         }
+        if stream:
+            payload["stream_options"] = {"include_usage": True}
         return Request(
             f"{self.base_url}/chat/completions",
             data=json.dumps(payload).encode("utf-8"),
@@ -233,6 +316,11 @@ class OpenAICompatibleGenerator:
     def generate(self, question: str, context: str) -> str:
         """Call the OpenAI-compatible ``/chat/completions`` API."""
 
+        return self.generate_with_usage(question, context).text
+
+    def generate_with_usage(self, question: str, context: str) -> GenerationResult:
+        """Generate text and retain response ``usage`` when supplied."""
+
         request = self._request(question, context, stream=False)
         try:
             with self._urlopen(request, timeout=self.timeout) as response:
@@ -245,10 +333,19 @@ class OpenAICompatibleGenerator:
             raise GenerationError(
                 "OpenAI-compatible provider returned an empty response"
             )
-        return answer.strip()
+        return GenerationResult(answer.strip(), _openai_usage(response_payload))
 
     def stream_generate(self, question: str, context: str) -> Iterator[str]:
         """Yield deltas from an OpenAI-compatible SSE response."""
+
+        for chunk in self.stream_generate_with_usage(question, context):
+            if chunk.text:
+                yield chunk.text
+
+    def stream_generate_with_usage(
+        self, question: str, context: str
+    ) -> Iterator[GenerationChunk]:
+        """Yield SSE deltas and usage when an OpenAI-compatible server sends it."""
 
         request = self._request(question, context, stream=True)
         yielded = False
@@ -266,12 +363,19 @@ class OpenAICompatibleGenerator:
                         completed = True
                         break
                     event = json.loads(data)
-                    delta = event["choices"][0]["delta"].get("content")
+                    if not isinstance(event, dict):
+                        raise TypeError("stream event must be an object")
+                    usage = _openai_usage(event)
+                    choices = event.get("choices", [])
+                    delta = None
+                    if choices:
+                        delta = choices[0]["delta"].get("content")
                     if delta:
                         if not isinstance(delta, str):
                             raise TypeError("stream content delta must be text")
                         yielded = True
-                        yield delta
+                    if delta or usage is not None:
+                        yield GenerationChunk(text=delta or "", usage=usage)
         except GenerationError:
             raise
         except Exception as exc:

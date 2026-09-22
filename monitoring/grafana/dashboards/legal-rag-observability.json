@@ -1,0 +1,203 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": false,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "reqps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+      "id": 1,
+      "targets": [
+        {
+          "expr": "sum by (route) (rate(legal_rag_http_requests_total[$__rate_interval]))",
+          "legendFormat": "{{route}}",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP request rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "percent"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0},
+      "id": 2,
+      "targets": [
+        {
+          "expr": "100 * sum(rate(legal_rag_http_errors_total[$__rate_interval])) / clamp_min(sum(rate(legal_rag_http_requests_total[$__rate_interval])), 0.000001)",
+          "legendFormat": "error rate",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP error rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0},
+      "id": 3,
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, route) (rate(legal_rag_http_request_duration_seconds_bucket[$__rate_interval])))",
+          "legendFormat": "{{route}}",
+          "refId": "A"
+        }
+      ],
+      "title": "p95 HTTP latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "reqps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8},
+      "id": 4,
+      "targets": [
+        {
+          "expr": "sum by (mode) (rate(legal_rag_ask_requests_total[$__rate_interval]))",
+          "legendFormat": "{{mode}}",
+          "refId": "A"
+        }
+      ],
+      "title": "/ask request rate by mode",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 8},
+      "id": 5,
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(legal_rag_retrieval_duration_seconds_bucket[$__rate_interval])))",
+          "legendFormat": "p95 retrieval",
+          "refId": "A"
+        }
+      ],
+      "title": "p95 retrieval latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 8},
+      "id": 6,
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, provider, mode) (rate(legal_rag_generation_duration_seconds_bucket[$__rate_interval])))",
+          "legendFormat": "{{provider}} / {{mode}}",
+          "refId": "A"
+        }
+      ],
+      "title": "p95 generation latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 16},
+      "id": 7,
+      "targets": [
+        {
+          "expr": "sum(rate(legal_rag_retrieved_sources_sum[$__rate_interval])) / clamp_min(sum(rate(legal_rag_retrieved_sources_count[$__rate_interval])), 0.000001)",
+          "legendFormat": "mean sources",
+          "refId": "A"
+        }
+      ],
+      "title": "Mean retrieved source count",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 16},
+      "id": 8,
+      "targets": [
+        {
+          "expr": "sum by (provider, mode) (rate(legal_rag_llm_provider_failures_total[$__rate_interval]))",
+          "legendFormat": "{{provider}} / {{mode}}",
+          "refId": "A"
+        }
+      ],
+      "title": "LLM provider failure rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "percentunit"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 16},
+      "id": 9,
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total[$__rate_interval])",
+          "legendFormat": "CPU cores",
+          "refId": "A"
+        }
+      ],
+      "title": "Application process CPU",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "fieldConfig": {"defaults": {"unit": "bytes"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 24},
+      "id": 10,
+      "targets": [
+        {
+          "expr": "process_resident_memory_bytes",
+          "legendFormat": "resident memory",
+          "refId": "A"
+        }
+      ],
+      "title": "Application process memory",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "description": "Rate of authoritative provider-reported input/output tokens. Total is excluded to prevent double-counting.",
+      "fieldConfig": {"defaults": {"unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 24},
+      "id": 11,
+      "targets": [
+        {
+          "expr": "sum by (provider, token_type, mode) (rate(legal_rag_llm_tokens_total{token_type=~\"input|output\"}[$__rate_interval]))",
+          "legendFormat": "{{provider}} / {{mode}} / {{token_type}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Authoritative token usage rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "legal-rag-prometheus"},
+      "description": "USD/hour derived only from authoritative input/output usage and operator-configured per-million-token rates. No series means pricing or component usage is unavailable; it does not mean free usage.",
+      "fieldConfig": {"defaults": {"unit": "currencyUSD"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 24},
+      "id": 12,
+      "targets": [
+        {
+          "expr": "sum by (provider, mode) (rate(legal_rag_llm_usage_cost_usd_total[$__rate_interval])) * 3600",
+          "legendFormat": "{{provider}} / {{mode}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Configured LLM cost per hour",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 41,
+  "tags": ["legal-rag", "module-4", "prometheus"],
+  "templating": {"list": []},
+  "time": {"from": "now-30m", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Arabic Legal RAG Observability",
+  "uid": "arabic-legal-rag-observability",
+  "version": 1
+}

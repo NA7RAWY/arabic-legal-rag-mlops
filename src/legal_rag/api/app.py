@@ -6,7 +6,8 @@ from collections.abc import Iterator
 
 import psycopg
 from fastapi import Depends, FastAPI, Request
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, Response, StreamingResponse
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 from legal_rag.api.dependencies import RAGConfigurationError, get_rag_service
 from legal_rag.api.schemas import (
@@ -17,6 +18,7 @@ from legal_rag.api.schemas import (
 )
 from legal_rag.config import AppConfig, get_config
 from legal_rag.logging_conf import configure_logging
+from legal_rag.monitoring import PrometheusMetrics, PrometheusMiddleware, get_metrics
 from legal_rag.rag import (
     GenerationError,
     LegalRAGService,
@@ -65,16 +67,21 @@ def _stream_events(result: LegalRAGStreamResult) -> Iterator[str]:
     yield _sse_event("done", {})
 
 
-def create_app(config: AppConfig | None = None) -> FastAPI:
+def create_app(
+    config: AppConfig | None = None,
+    metrics: PrometheusMetrics | None = None,
+) -> FastAPI:
     """Create the API application without initializing external services."""
 
     active_config = config if config is not None else get_config()
+    active_metrics = metrics if metrics is not None else get_metrics()
     configure_logging(active_config.log_level)
     application = FastAPI(
         title=active_config.app_name,
         version=active_config.app_version,
         description=f"Environment: {active_config.environment}",
     )
+    application.add_middleware(PrometheusMiddleware, metrics=active_metrics)
 
     @application.exception_handler(RAGConfigurationError)
     async def handle_configuration_error(
@@ -128,11 +135,19 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
             version=active_config.app_version,
         )
 
+    @application.get("/metrics", include_in_schema=False)
+    def prometheus_metrics() -> Response:
+        return Response(
+            content=generate_latest(active_metrics.registry),
+            media_type=CONTENT_TYPE_LATEST,
+        )
+
     @application.post("/ask", response_model=AskResponse)
     def ask(
         request: AskRequest,
         service: LegalRAGService = Depends(get_rag_service),
     ) -> AskResponse:
+        active_metrics.record_ask("full")
         top_k = (
             active_config.retrieval_top_k if request.top_k is None else request.top_k
         )
@@ -167,6 +182,7 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
         request: AskRequest,
         service: LegalRAGService = Depends(get_rag_service),
     ) -> StreamingResponse:
+        active_metrics.record_ask("stream")
         top_k = (
             active_config.retrieval_top_k if request.top_k is None else request.top_k
         )

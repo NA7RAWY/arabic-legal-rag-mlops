@@ -14,10 +14,12 @@ RUN groupadd --system legal-rag \
 RUN python -m pip install --upgrade pip \
     && python -m pip install torch --index-url https://download.pytorch.org/whl/cpu \
     && python -m pip install \
-        "anyio>=4.8,<4.10" \
+        "anyio>=4.10,<5" \
         "fastapi>=0.115,<0.116" \
         google-genai \
+        "langfuse>=4,<5" \
         "mlflow-skinny>=3.3,<4" \
+        "prometheus-client>=0.21,<1" \
         "psycopg[binary]" \
         sentence-transformers \
         uvicorn

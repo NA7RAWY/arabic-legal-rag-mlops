@@ -44,6 +44,7 @@ class FakeModels:
         self.stream_texts = ["الإجابة ", "[المادة 148]"]
         self.error: Exception | None = None
         self.failures: list[Exception] = []
+        self.usage_metadata: SimpleNamespace | None = None
 
     def _raise_failure(self) -> None:
         if self.failures:
@@ -54,12 +55,17 @@ class FakeModels:
     def generate_content(self, **kwargs: Any) -> SimpleNamespace:
         self.calls.append(kwargs)
         self._raise_failure()
-        return SimpleNamespace(text=self.response_text)
+        return SimpleNamespace(
+            text=self.response_text, usage_metadata=self.usage_metadata
+        )
 
     def generate_content_stream(self, **kwargs: Any) -> list[SimpleNamespace]:
         self.stream_calls.append(kwargs)
         self._raise_failure()
-        return [SimpleNamespace(text=text) for text in self.stream_texts]
+        return [
+            SimpleNamespace(text=text, usage_metadata=self.usage_metadata)
+            for text in self.stream_texts
+        ]
 
 
 class FakeClient:
@@ -237,6 +243,64 @@ def test_openai_compatible_generator_preserves_grounded_prompt() -> None:
     }
 
 
+def test_gemini_usage_comes_only_from_official_response_metadata() -> None:
+    models = FakeModels()
+    models.usage_metadata = SimpleNamespace(
+        prompt_token_count=21,
+        candidates_token_count=8,
+        total_token_count=29,
+    )
+    generator = GeminiGenerator(api_key="test-key", client=FakeClient(models))
+
+    result = generator.generate_with_usage("question", "context")
+
+    assert result.usage is not None
+    assert result.usage.input_tokens == 21
+    assert result.usage.output_tokens == 8
+    assert result.usage.total_tokens == 29
+
+
+def test_gemini_missing_usage_remains_unknown() -> None:
+    generator = GeminiGenerator(api_key="test-key", client=FakeClient(FakeModels()))
+
+    assert generator.generate_with_usage("question", "context").usage is None
+
+
+def test_openai_compatible_usage_comes_only_from_response_metadata() -> None:
+    opener = FakeURLOpen(
+        payload={
+            "choices": [{"message": {"content": "answer"}}],
+            "usage": {
+                "prompt_tokens": 13,
+                "completion_tokens": 5,
+                "total_tokens": 18,
+            },
+        }
+    )
+    generator = OpenAICompatibleGenerator(
+        base_url="http://vllm:8000/v1",
+        model_name="local-model",
+        urlopen_callable=opener,
+    )
+
+    result = generator.generate_with_usage("question", "context")
+
+    assert result.usage is not None
+    assert result.usage.input_tokens == 13
+    assert result.usage.output_tokens == 5
+    assert result.usage.total_tokens == 18
+
+
+def test_openai_compatible_missing_usage_remains_unknown() -> None:
+    generator = OpenAICompatibleGenerator(
+        base_url="http://vllm:8000/v1",
+        model_name="local-model",
+        urlopen_callable=FakeURLOpen(),
+    )
+
+    assert generator.generate_with_usage("question", "context").usage is None
+
+
 def test_openai_compatible_generator_maps_network_failure() -> None:
     opener = FakeURLOpen()
     opener.error = OSError("connection refused")
@@ -274,6 +338,25 @@ def test_gemini_generator_streams_grounded_chunks_in_order() -> None:
         "User question:\nما حكم العقد؟\n\nRetrieved legal context:\nlegal context"
     )
     assert models.stream_calls[0]["config"].system_instruction == SYSTEM_INSTRUCTION
+
+
+def test_gemini_stream_usage_uses_provider_snapshots_without_estimation() -> None:
+    models = FakeModels()
+    models.usage_metadata = SimpleNamespace(
+        prompt_token_count=17,
+        candidates_token_count=6,
+        total_token_count=23,
+    )
+    generator = GeminiGenerator(api_key="test-key", client=FakeClient(models))
+
+    chunks = list(generator.stream_generate_with_usage("question", "context"))
+
+    assert [chunk.text for chunk in chunks] == models.stream_texts
+    assert all(chunk.usage is not None for chunk in chunks)
+    assert chunks[-1].usage is not None
+    assert chunks[-1].usage.input_tokens == 17
+    assert chunks[-1].usage.output_tokens == 6
+    assert chunks[-1].usage.total_tokens == 23
 
 
 def test_gemini_streaming_maps_provider_failure() -> None:
@@ -408,10 +491,35 @@ def test_openai_compatible_generator_parses_sse_until_done() -> None:
     assert request.full_url == "http://vllm:8000/v1/chat/completions"
     assert payload["model"] == "local-model"
     assert payload["stream"] is True
+    assert payload["stream_options"] == {"include_usage": True}
     assert payload["messages"][0] == {
         "role": "system",
         "content": SYSTEM_INSTRUCTION,
     }
+
+
+def test_openai_compatible_stream_usage_is_emitted_once_when_supplied() -> None:
+    opener = FakeURLOpen(
+        lines=[
+            b'data: {"choices":[{"delta":{"content":"answer"}}]}\n',
+            (
+                b'data: {"choices":[],"usage":{"prompt_tokens":10,'
+                b'"completion_tokens":3,"total_tokens":13}}\n'
+            ),
+            b"data: [DONE]\n",
+        ]
+    )
+    generator = OpenAICompatibleGenerator(
+        base_url="http://vllm:8000/v1",
+        model_name="local-model",
+        urlopen_callable=opener,
+    )
+
+    chunks = list(generator.stream_generate_with_usage("question", "context"))
+
+    assert [chunk.text for chunk in chunks] == ["answer", ""]
+    assert chunks[-1].usage is not None
+    assert chunks[-1].usage.total_tokens == 13
 
 
 def test_openai_compatible_streaming_maps_network_failure() -> None:

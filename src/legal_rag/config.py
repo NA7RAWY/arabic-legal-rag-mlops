@@ -2,6 +2,7 @@
 
 import os
 from dataclasses import dataclass, field
+from math import isfinite
 from pathlib import Path
 
 
@@ -11,6 +12,31 @@ def _postgres_port() -> int:
         return int(value)
     except ValueError as exc:
         raise ValueError("POSTGRES_PORT must be an integer") from exc
+
+
+def _environment_flag(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise ValueError(f"{name} must be a boolean value")
+
+
+def _optional_nonnegative_float(name: str) -> float | None:
+    value = os.getenv(name)
+    if value is None or not value.strip():
+        return None
+    try:
+        parsed = float(value)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be a number") from exc
+    if not isfinite(parsed) or parsed < 0:
+        raise ValueError(f"{name} must be a finite nonnegative number")
+    return parsed
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,6 +74,16 @@ class AppConfig:
     vllm_api_key: str = field(
         default_factory=lambda: os.getenv("VLLM_API_KEY", "EMPTY")
     )
+    llm_input_cost_per_million_tokens_usd: float | None = field(
+        default_factory=lambda: _optional_nonnegative_float(
+            "LLM_INPUT_COST_PER_1M_TOKENS_USD"
+        )
+    )
+    llm_output_cost_per_million_tokens_usd: float | None = field(
+        default_factory=lambda: _optional_nonnegative_float(
+            "LLM_OUTPUT_COST_PER_1M_TOKENS_USD"
+        )
+    )
     mlflow_tracking_uri: str = field(
         default_factory=lambda: os.getenv(
             "MLFLOW_TRACKING_URI", "http://localhost:5000"
@@ -65,6 +101,20 @@ class AppConfig:
     )
     mlflow_artifact_root: str = field(
         default_factory=lambda: os.getenv("MLFLOW_ARTIFACT_ROOT", "/mlflow/artifacts")
+    )
+    langfuse_enabled: bool = field(
+        default_factory=lambda: _environment_flag("LANGFUSE_ENABLED")
+    )
+    langfuse_public_key: str | None = field(
+        default_factory=lambda: os.getenv("LANGFUSE_PUBLIC_KEY")
+    )
+    langfuse_secret_key: str | None = field(
+        default_factory=lambda: os.getenv("LANGFUSE_SECRET_KEY")
+    )
+    langfuse_base_url: str = field(
+        default_factory=lambda: os.getenv(
+            "LANGFUSE_BASE_URL", "https://cloud.langfuse.com"
+        )
     )
     postgres_db: str = field(
         default_factory=lambda: os.getenv("POSTGRES_DB", "legal_rag")

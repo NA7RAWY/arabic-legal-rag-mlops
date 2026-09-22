@@ -67,6 +67,21 @@ class SentenceTransformerEmbedder:
         vector = self._to_list(encoded)
         return [float(value) for value in vector]
 
+    def embed_queries(self, texts: list[str]) -> list[list[float]]:
+        """Batch-embed non-empty queries with the E5 query prefix."""
+
+        if not texts:
+            return []
+        if any(not text.strip() for text in texts):
+            raise ValueError("Query texts must not be empty or whitespace-only")
+
+        encoded = self._get_model().encode(
+            [f"query: {text}" for text in texts],
+            normalize_embeddings=True,
+        )
+        vectors = self._to_list(encoded)
+        return [[float(value) for value in vector] for vector in vectors]
+
     def embed_chunks(self, chunks: list[LegalChunk]) -> list[list[float]]:
         """Embed legal chunk text while preserving chunk order."""
 

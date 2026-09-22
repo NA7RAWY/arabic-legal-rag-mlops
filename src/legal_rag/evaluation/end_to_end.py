@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import argparse
 import json
-from collections.abc import Mapping
+import logging
+import time
+from collections.abc import Callable, Mapping
 from contextlib import AbstractContextManager
 from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from statistics import fmean
 from typing import Any, Protocol
@@ -20,6 +23,7 @@ from legal_rag.evaluation.dataset import (
 )
 from legal_rag.evaluation.ragas_evaluator import (
     GeminiRagasEvaluator,
+    RagasEvaluationError,
     RagasEvaluator,
     RagasScores,
 )
@@ -50,6 +54,15 @@ from legal_rag.tracking.mlflow_tracker import (
 )
 
 RUN_NAME = "module2-end-to-end-eval"
+DEFAULT_REPORT_PATH = Path("artifacts/evaluation/ragas_50_case_report.json")
+RAGAS_METRIC_NAMES = (
+    "faithfulness",
+    "answer_relevancy",
+    "context_recall",
+    "context_precision",
+)
+
+logger = logging.getLogger(__name__)
 
 
 class _Retriever(Protocol):
@@ -92,9 +105,21 @@ class EndToEndCaseResult:
     relevant_article_numbers: tuple[int, ...]
     retrieved_article_numbers: tuple[int, ...]
     retrieved_contexts: tuple[EvaluatedContext, ...]
-    generated_answer: str
-    retrieval_metrics: CaseRetrievalMetrics
-    ragas_metrics: RagasScores
+    generated_answer: str | None
+    retrieval_metrics: CaseRetrievalMetrics | None
+    ragas_metrics: RagasScores | None
+    status: str
+    failure: CaseEvaluationFailure | None
+
+
+@dataclass(frozen=True, slots=True)
+class CaseEvaluationFailure:
+    """Sanitized, machine-readable failure for one evaluation case."""
+
+    stage: str
+    error_type: str
+    message: str
+    provider_status_code: int | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -107,10 +132,15 @@ class EndToEndReport:
     git_dirty: bool
     generation_model: str
     evaluation_model: str
+    ragas_version: str
+    ragas_metric_names: tuple[str, ...]
     retrieval_top_k: int
+    case_delay_seconds: float
     number_of_cases: int
-    aggregate_retrieval_metrics: AggregateRetrievalMetrics
-    aggregate_ragas_metrics: RagasScores
+    successful_cases: int
+    failed_cases: int
+    aggregate_retrieval_metrics: AggregateRetrievalMetrics | None
+    aggregate_ragas_metrics: RagasScores | None
     cases: tuple[EndToEndCaseResult, ...]
 
 
@@ -131,6 +161,48 @@ def _mean_ragas(scores: tuple[RagasScores, ...]) -> RagasScores:
     )
 
 
+def _installed_ragas_version() -> str:
+    try:
+        return version("ragas")
+    except PackageNotFoundError:
+        return "unavailable"
+
+
+def _provider_status_code(exc: Exception) -> int | None:
+    """Find an integer provider status without exposing exception text."""
+
+    current: BaseException | None = exc
+    seen: set[int] = set()
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        for value in (
+            getattr(current, "code", None),
+            getattr(current, "status_code", None),
+            getattr(getattr(current, "response", None), "status_code", None),
+        ):
+            if isinstance(value, int) and not isinstance(value, bool):
+                return value
+        current = current.__cause__ or current.__context__
+    return None
+
+
+def _failure(stage: str, exc: Exception) -> CaseEvaluationFailure:
+    return CaseEvaluationFailure(
+        stage=stage,
+        error_type=type(exc).__name__,
+        message=f"{stage} failed",
+        provider_status_code=_provider_status_code(exc),
+    )
+
+
+def _write_report(report: EndToEndReport, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(asdict(report), ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
 def evaluate_end_to_end(
     dataset: EvaluationDataset,
     *,
@@ -144,14 +216,31 @@ def evaluate_end_to_end(
     git_dirty: bool,
     generation_model: str,
     evaluation_model: str,
+    case_delay_seconds: float = 0,
+    sleep_callable: Callable[[float], None] = time.sleep,
 ) -> EndToEndReport:
     """Retrieve, generate once, and judge each case in dataset order."""
 
     if top_k <= 0:
         raise ValueError("top_k must be greater than zero")
+    if case_delay_seconds < 0:
+        raise ValueError("case_delay_seconds must not be negative")
     case_results: list[EndToEndCaseResult] = []
-    for case in dataset.cases:
-        retrieved = retriever.search(case.question, top_k=top_k)
+    for case_index, case in enumerate(dataset.cases):
+        retrieved: list[RetrievalResult] = []
+        contexts: tuple[EvaluatedContext, ...] = ()
+        retrieved_numbers: tuple[int, ...] = ()
+        retrieval_metrics: CaseRetrievalMetrics | None = None
+        answer: str | None = None
+        ragas_scores: RagasScores | None = None
+        failure: CaseEvaluationFailure | None = None
+        try:
+            retrieved = retriever.search(case.question, top_k=top_k)
+            if not retrieved:
+                raise ValueError("retrieval returned no contexts")
+        except Exception as exc:
+            failure = _failure("retrieval", exc)
+
         contexts = tuple(
             EvaluatedContext(
                 rank=rank,
@@ -164,15 +253,36 @@ def evaluate_end_to_end(
             )
             for rank, result in enumerate(retrieved, start=1)
         )
-        answer = generator.generate(case.question, build_legal_context(retrieved))
-        context_texts = [context.text for context in contexts]
-        ragas_scores = evaluator.evaluate(
-            question=case.question,
-            answer=answer,
-            contexts=context_texts,
-            reference_answer=case.reference_answer,
-        )
         retrieved_numbers = tuple(context.article_number for context in contexts)
+        if retrieved:
+            retrieval_metrics = calculate_case_metrics(
+                retrieved_numbers,
+                case.relevant_article_numbers,
+                top_k=top_k,
+            )
+        if failure is None:
+            try:
+                answer = generator.generate(
+                    case.question, build_legal_context(retrieved)
+                )
+            except Exception as exc:
+                failure = _failure("generation", exc)
+        if failure is None and answer is not None:
+            try:
+                evaluated_scores = evaluator.evaluate(
+                    question=case.question,
+                    answer=answer,
+                    contexts=[context.text for context in contexts],
+                    reference_answer=case.reference_answer,
+                )
+                if not isinstance(evaluated_scores, RagasScores):
+                    raise RagasEvaluationError(
+                        "RAGAS evaluator returned an invalid score bundle"
+                    )
+                ragas_scores = evaluated_scores
+            except Exception as exc:
+                failure = _failure("ragas", exc)
+
         case_results.append(
             EndToEndCaseResult(
                 case_id=case.id,
@@ -182,17 +292,35 @@ def evaluate_end_to_end(
                 retrieved_article_numbers=retrieved_numbers,
                 retrieved_contexts=contexts,
                 generated_answer=answer,
-                retrieval_metrics=calculate_case_metrics(
-                    retrieved_numbers,
-                    case.relevant_article_numbers,
-                    top_k=top_k,
-                ),
+                retrieval_metrics=retrieval_metrics,
                 ragas_metrics=ragas_scores,
+                status="success" if failure is None else "failed",
+                failure=failure,
             )
         )
+        if failure is None:
+            logger.info("Completed evaluation case %s", case.id)
+        else:
+            logger.warning(
+                "Evaluation case %s failed during %s with %s (provider status %s)",
+                case.id,
+                failure.stage,
+                failure.error_type,
+                failure.provider_status_code or "unavailable",
+            )
+        if case_delay_seconds and case_index < len(dataset.cases) - 1:
+            sleep_callable(case_delay_seconds)
+
     ordered = tuple(case_results)
     if not ordered:
         raise ValueError("Evaluation dataset must contain at least one case")
+    valid_retrieval = tuple(
+        case.retrieval_metrics for case in ordered if case.retrieval_metrics is not None
+    )
+    valid_ragas = tuple(
+        case.ragas_metrics for case in ordered if case.ragas_metrics is not None
+    )
+    successful_cases = len(valid_ragas)
     return EndToEndReport(
         dataset_version=dataset.version,
         dataset_path=str(dataset_path),
@@ -202,14 +330,17 @@ def evaluate_end_to_end(
         git_dirty=git_dirty,
         generation_model=generation_model,
         evaluation_model=evaluation_model,
+        ragas_version=_installed_ragas_version(),
+        ragas_metric_names=RAGAS_METRIC_NAMES,
         retrieval_top_k=top_k,
+        case_delay_seconds=case_delay_seconds,
         number_of_cases=len(ordered),
-        aggregate_retrieval_metrics=aggregate_metrics(
-            tuple(case.retrieval_metrics for case in ordered)
+        successful_cases=successful_cases,
+        failed_cases=len(ordered) - successful_cases,
+        aggregate_retrieval_metrics=(
+            aggregate_metrics(valid_retrieval) if valid_retrieval else None
         ),
-        aggregate_ragas_metrics=_mean_ragas(
-            tuple(case.ragas_metrics for case in ordered)
-        ),
+        aggregate_ragas_metrics=_mean_ragas(valid_ragas) if valid_ragas else None,
         cases=ordered,
     )
 
@@ -240,6 +371,8 @@ def run_end_to_end_evaluation(
     log_to_mlflow: bool = True,
     git_commit: str | None = None,
     git_dirty: bool | None = None,
+    output_path: Path | None = None,
+    case_delay_seconds: float = 0,
 ) -> EndToEndEvaluationRun:
     """Run an end-to-end benchmark and optionally persist one MLflow run."""
 
@@ -273,7 +406,10 @@ def run_end_to_end_evaluation(
         git_dirty=dirty,
         generation_model=active_config.gemini_model,
         evaluation_model=active_config.evaluation_model,
+        case_delay_seconds=case_delay_seconds,
     )
+    if output_path is not None:
+        _write_report(report, output_path)
     if not log_to_mlflow:
         return EndToEndEvaluationRun(run_id="", report=report)
 
@@ -287,20 +423,34 @@ def run_end_to_end_evaluation(
         run_purpose=RUN_NAME,
         eval_dataset=dataset.version,
         evaluator_model=active_config.evaluation_model,
+        eval_dataset_sha256=corpus_sha256(dataset_path),
+        eval_cases=len(dataset.cases),
     )
     active_tracker = tracker or MLflowTracker(active_config)
-    retrieval = report.aggregate_retrieval_metrics
-    ragas = report.aggregate_ragas_metrics
-    metrics = {
-        RAGEvaluationMetric.RETRIEVAL_HIT_RATE_AT_K: retrieval.hit_rate_at_k,
-        RAGEvaluationMetric.RETRIEVAL_RECALL_AT_K: retrieval.recall_at_k,
-        RAGEvaluationMetric.RETRIEVAL_PRECISION_AT_K: retrieval.precision_at_k,
-        RAGEvaluationMetric.RETRIEVAL_MRR: retrieval.mean_reciprocal_rank,
-        RAGEvaluationMetric.RAGAS_FAITHFULNESS: ragas.faithfulness,
-        RAGEvaluationMetric.RAGAS_ANSWER_RELEVANCY: ragas.answer_relevancy,
-        RAGEvaluationMetric.RAGAS_CONTEXT_RECALL: ragas.context_recall,
-        RAGEvaluationMetric.RAGAS_CONTEXT_PRECISION: ragas.context_precision,
+    metrics: dict[RAGEvaluationMetric, float] = {
+        RAGEvaluationMetric.EVALUATION_SUCCESSFUL_CASES: float(report.successful_cases),
+        RAGEvaluationMetric.EVALUATION_FAILED_CASES: float(report.failed_cases),
     }
+    retrieval = report.aggregate_retrieval_metrics
+    if retrieval is not None:
+        metrics.update(
+            {
+                RAGEvaluationMetric.RETRIEVAL_HIT_RATE_AT_K: retrieval.hit_rate_at_k,
+                RAGEvaluationMetric.RETRIEVAL_RECALL_AT_K: retrieval.recall_at_k,
+                RAGEvaluationMetric.RETRIEVAL_PRECISION_AT_K: retrieval.precision_at_k,
+                RAGEvaluationMetric.RETRIEVAL_MRR: retrieval.mean_reciprocal_rank,
+            }
+        )
+    ragas = report.aggregate_ragas_metrics
+    if ragas is not None:
+        metrics.update(
+            {
+                RAGEvaluationMetric.RAGAS_FAITHFULNESS: ragas.faithfulness,
+                RAGEvaluationMetric.RAGAS_ANSWER_RELEVANCY: ragas.answer_relevancy,
+                RAGEvaluationMetric.RAGAS_CONTEXT_RECALL: ragas.context_recall,
+                RAGEvaluationMetric.RAGAS_CONTEXT_PRECISION: ragas.context_precision,
+            }
+        )
     with active_tracker.start_run(RUN_NAME) as run:
         active_tracker.log_experiment_config(experiment)
         active_tracker.log_evaluation_metrics(metrics)
@@ -310,9 +460,10 @@ def run_end_to_end_evaluation(
         active_tracker.log_config_bundle(asdict(experiment), "config/rag_config.json")
         active_tracker.log_config_bundle(
             {
-                "ragas_version": "0.4.3",
+                "ragas_version": report.ragas_version,
                 "metrics_api": "ragas.metrics.collections",
                 "evaluation_model": active_config.evaluation_model,
+                "case_delay_seconds": case_delay_seconds,
             },
             "config/evaluation_config.json",
         )
@@ -324,10 +475,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--no-mlflow", action="store_true")
+    parser.add_argument("--output", type=Path, default=DEFAULT_REPORT_PATH)
+    parser.add_argument("--case-delay-seconds", type=float, default=0)
     args = parser.parse_args()
     outcome = run_end_to_end_evaluation(
         case_limit=args.limit,
         log_to_mlflow=not args.no_mlflow,
+        output_path=args.output,
+        case_delay_seconds=args.case_delay_seconds,
     )
     print(
         json.dumps(
@@ -336,6 +491,8 @@ def main() -> None:
             indent=2,
         )
     )
+    if outcome.report.failed_cases:
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":

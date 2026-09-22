@@ -3,6 +3,7 @@
 from threading import Lock
 
 from legal_rag.config import get_config
+from legal_rag.monitoring import build_rag_tracer, get_metrics
 from legal_rag.rag import (
     LegalRAGService,
     LegalRetriever,
@@ -25,7 +26,26 @@ def _build_rag_service() -> LegalRAGService:
         generator = build_generator(config)
     except ValueError as exc:
         raise RAGConfigurationError("RAG generation service is not configured") from exc
-    return LegalRAGService(retriever, generator)
+    generator_model = (
+        config.gemini_model
+        if config.llm_provider.strip().lower() == "gemini"
+        else config.vllm_model
+    )
+    return LegalRAGService(
+        retriever,
+        generator,
+        metrics=get_metrics(),
+        tracer=build_rag_tracer(config),
+        provider=config.llm_provider,
+        embedding_model=config.embedding_model,
+        generator_model=generator_model,
+        input_cost_per_million_tokens_usd=(
+            config.llm_input_cost_per_million_tokens_usd
+        ),
+        output_cost_per_million_tokens_usd=(
+            config.llm_output_cost_per_million_tokens_usd
+        ),
+    )
 
 
 _service: LegalRAGService | None = None
