@@ -17,6 +17,12 @@ services:
       VLLM_BASE_URL: ${VLLM_BASE_URL:-http://host.docker.internal:8000/v1}
       VLLM_MODEL: ${VLLM_MODEL:-Qwen/Qwen2.5-7B-Instruct}
       VLLM_API_KEY: ${VLLM_API_KEY:-EMPTY}
+      LLM_INPUT_COST_PER_1M_TOKENS_USD: ${LLM_INPUT_COST_PER_1M_TOKENS_USD:-}
+      LLM_OUTPUT_COST_PER_1M_TOKENS_USD: ${LLM_OUTPUT_COST_PER_1M_TOKENS_USD:-}
+      LANGFUSE_ENABLED: ${LANGFUSE_ENABLED:-false}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-https://cloud.langfuse.com}
       DEPLOYMENT_SLOT: stable
     extra_hosts:
       - "host.docker.internal:host-gateway"

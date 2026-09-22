@@ -232,6 +232,7 @@ mlruns/
 mlartifacts/
 locust_*.csv
 locust_*.html
+/artifacts/evaluation/
 
 # Marimo
 marimo/_static/

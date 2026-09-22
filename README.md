@@ -31,6 +31,8 @@ Egyptian Civil Code JSON (DVC)
 - Module 3: Airflow orchestration, BentoML, optional vLLM, HTTP/SSE streaming,
   Locust scenarios, bounded provider retries, canary release, and Docker Hub
   publishing automation.
+- Module 4 in progress: Prometheus/Grafana metrics, offline query-embedding
+  drift, and privacy-conscious Langfuse request tracing.
 
 The production defaults remain one legal article per chunk and `top_k=5`.
 Gemini remains the default generator; vLLM is an optional OpenAI-compatible
@@ -41,7 +43,8 @@ backend.
 Python 3.12, FastAPI, BentoML, Sentence Transformers
 (`intfloat/multilingual-e5-small`), PostgreSQL/pgvector, Psycopg, Gemini,
 OpenAI-compatible vLLM HTTP APIs, MLflow, DVC, Airflow, Locust, nginx, Docker
-Compose, Ruff, pytest, pre-commit, and GitHub Actions.
+Compose, Prometheus/Grafana, Langfuse, Ruff, pytest, pre-commit, and GitHub
+Actions.
 
 ## Repository layout
 
@@ -81,7 +84,11 @@ Important environment variables include:
 - Generation: `LLM_PROVIDER` (`gemini` by default), `GEMINI_API_KEY`,
   `GEMINI_MODEL`
 - Optional vLLM: `VLLM_BASE_URL`, `VLLM_MODEL`, `VLLM_API_KEY`
+- Optional monitoring prices: `LLM_INPUT_COST_PER_1M_TOKENS_USD`,
+  `LLM_OUTPUT_COST_PER_1M_TOKENS_USD` (explicit rates for the active model)
 - Tracking: `MLFLOW_TRACKING_URI`, `MLFLOW_EXPERIMENT_NAME`
+- Optional tracing: `LANGFUSE_ENABLED`, `LANGFUSE_PUBLIC_KEY`,
+  `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL`
 - Evaluation judge: `EVALUATION_MODEL`
 
 See `.env.example` for development-safe placeholders and defaults.
@@ -137,6 +144,7 @@ bentoml serve legal_rag.serving.service:LegalRAGBentoService \
 Endpoints:
 
 - `GET /health`: lightweight; does not initialize E5, PostgreSQL, or a provider.
+- `GET /metrics`: Prometheus metrics; does not initialize the RAG dependency.
 - `POST /ask`: JSON request/response with answer and concise sources.
 - `POST /ask/stream`: Server-Sent Events (SSE), ordered
   `sources -> token... -> done` on success.
@@ -153,11 +161,52 @@ curl --no-buffer -X POST http://127.0.0.1:8000/ask/stream \
   -d '{"question":"متى يكون الشخص مسؤولاً عن التعويض؟","top_k":5}'
 ```
 
-Streaming buffers the first provider chunk before exposing sources. Retryable
-Gemini failures can use bounded backoff before that commit point. After any SSE
-event is visible, generation is not restarted; a sanitized `error` event reports
-failure without duplicating text. See [HTTP streaming](docs/http_streaming.md)
-and [BentoML serving](docs/bentoml_serving.md).
+The Gemini adapter retains bounded retry before its first provider chunk. The
+service incrementally releases text through a bounded PII-aware suffix buffer.
+If generation later fails, already emitted safe text remains visible, unresolved
+text is discarded, and the stream ends with the sanitized SSE error. Generation
+is never restarted after provider output begins. See
+[HTTP streaming](docs/http_streaming.md) and
+[BentoML serving](docs/bentoml_serving.md).
+
+Generated answers pass through an always-on deterministic PII guardrail for
+email addresses, Egyptian mobile numbers, and structurally valid Egyptian
+national IDs. Full responses are redacted before serialization. Streaming
+answers use a rolling candidate buffer, preventing chunk-boundary leakage while
+safe text remains incremental. At most 254 characters are retained for a
+standards-length email candidate; phone and national-ID candidates are shorter.
+Source records are preserved. This is targeted pattern protection, not a claim
+of universal PII detection; details and monitoring behavior are in [the
+monitoring guide](docs/monitoring.md).
+
+Prometheus records authoritative provider token metadata when it is returned;
+optional cost/hour requires explicit per-million-token USD rates and is never
+guessed from the model name or answer text. Metric names, timing boundaries, and
+safe labels are documented in
+[the monitoring guide](docs/monitoring.md).
+
+Langfuse tracing is disabled by default. When explicitly enabled and configured,
+each full or streaming RAG execution records a `legal-rag-request` chain with
+`retrieval` and `generation` children. Question text, generated answers, and
+retrieved legal text are not captured. Langfuse Cloud or a compatible URL may be
+used; the project does not run Langfuse's heavy self-hosted infrastructure in
+the local Compose stack. See [the monitoring guide](docs/monitoring.md).
+
+For local dashboards, start `prometheus` and `grafana` from Compose after binding
+the host FastAPI service to `0.0.0.0:8000`. Prometheus is available on port 9090;
+Grafana and its provisioned Legal RAG dashboard are available on port 3001.
+
+Inspect the frozen 50-question query-embedding reference or compare an offline
+JSON/JSONL query batch without PostgreSQL or an LLM provider:
+
+```bash
+python -m legal_rag.monitoring.drift
+python -m legal_rag.monitoring.drift --input current_queries.json
+```
+
+This cosine-to-reference-centroid signal detects query-distribution change, not
+answer correctness. Optional thresholds are operational policy, not validated
+quality boundaries; see [the monitoring guide](docs/monitoring.md).
 
 ## Optional vLLM backend
 
@@ -227,6 +276,25 @@ seen by the HTTP client, not true model/GPU time-to-first-token. Controlled
 results are serving-layer measurements, not model throughput. See
 [load testing](docs/load_testing.md).
 
+## Offline RAGAS quality evaluation
+
+The end-to-end evaluator reuses the DVC-managed 50-case Arabic benchmark and
+reports faithfulness, answer relevancy, context recall, and context precision.
+It runs sequentially and is never invoked by normal API traffic or CI:
+
+```bash
+python -m legal_rag.evaluation.end_to_end \
+  --output artifacts/evaluation/ragas_50_case_report.json \
+  --case-delay-seconds 1
+```
+
+Failed generation or judge cases remain explicit failed records with null RAGAS
+scores and are excluded from aggregates. The local JSON is written before the
+optional MLflow run. This command consumes Gemini generation and judge quota;
+only a report with all 50 cases successfully scored is evidence of a completed
+benchmark. See [the monitoring guide](docs/monitoring.md) for call structure,
+failure semantics, and `--no-mlflow` usage.
+
 ## Canary release and rollback
 
 The local canary runs stable and candidate BentoML containers behind nginx with
@@ -285,6 +353,9 @@ skipped on fresh CI runners until a DVC remote can restore canonical outputs.
   normalized canonical corpus and audit artifacts are versioned separately.
 - Live RAGAS scoring depends on Gemini judge availability and quota; no missing
   metric values are fabricated.
+- The complete 50-case RAGAS report and live token/cost samples are currently
+  provider-blocked by repeated Gemini 503/429 responses. The infrastructure and
+  mocked metadata paths are tested, but no scores or usage evidence are claimed.
 - Gemini is an external network/quota dependency despite bounded 429/5xx retries.
 - Current local hardware cannot represent production 7B vLLM throughput.
 - The single-machine nginx canary has one failure domain and no automated

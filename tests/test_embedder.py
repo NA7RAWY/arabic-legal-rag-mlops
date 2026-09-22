@@ -102,6 +102,31 @@ def test_embed_query_prefixes_normalizes_and_returns_list(
     assert isinstance(vector, list)
 
 
+def test_embed_queries_batches_query_prefixes_and_preserves_order(
+    fake_embedder: tuple[SentenceTransformerEmbedder, FakeSentenceTransformer],
+) -> None:
+    embedder, model = fake_embedder
+
+    vectors = embedder.embed_queries(["first", "second"])
+
+    assert model.calls == [(["query: first", "query: second"], True)]
+    assert vectors == [[0.0, 1.0], [1.0, 2.0]]
+
+
+def test_embed_queries_rejects_empty_text_without_loading_model(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    embedder = SentenceTransformerEmbedder("fake-model")
+    monkeypatch.setattr(
+        embedder,
+        "_load_model",
+        lambda: pytest.fail("model should not be loaded"),
+    )
+
+    with pytest.raises(ValueError, match="must not be empty"):
+        embedder.embed_queries(["valid", " "])
+
+
 @pytest.mark.parametrize("query", ["", "   ", "\t\n"])
 def test_embed_query_rejects_empty_text(query: str) -> None:
     embedder = SentenceTransformerEmbedder("fake-model")

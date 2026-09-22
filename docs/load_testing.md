@@ -57,9 +57,9 @@ bounded exponential backoff before returning its existing safe provider error.
 Real-provider latency and failure rate must be reported separately; this small
 observation is not a production benchmark.
 
-For `/ask/stream`, retries are possible only while obtaining the buffered first
-provider chunk, before sources or text are sent to the client. After the first SSE
-events are committed, failures are reported as safe `error` events without retry.
+For `/ask/stream`, a bounded rolling suffix protects cross-chunk PII while safe
+text continues to stream. Provider failures preserve already emitted safe text,
+discard the unresolved suffix, and end with a safe `error` event.
 
 ## Metrics and interpretation
 
@@ -69,7 +69,8 @@ measurements:
 
 - `/ask/stream headers`: time until the HTTP response headers are available.
 - `/ask/stream first event`: elapsed client time until the first non-empty SSE
-  line is received. This is HTTP first-event latency, not GPU token-generation
+  line is received. This includes retrieval, provider startup, and any PII suffix
+  delay, so it is guarded HTTP first-event latency, not GPU token-generation
   latency or model TTFT.
 - `/ask/stream full response`: elapsed time until the entire SSE response has
   been consumed and validated.

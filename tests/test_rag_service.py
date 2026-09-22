@@ -3,9 +3,16 @@
 from collections.abc import Iterator
 
 import pytest
+from prometheus_client import CollectorRegistry
 
+from legal_rag.monitoring import PrometheusMetrics
 from legal_rag.rag import LegalRAGService, NoRetrievedContextError
-from legal_rag.rag.generator import build_legal_context
+from legal_rag.rag.generator import (
+    GenerationChunk,
+    GenerationResult,
+    LLMUsage,
+    build_legal_context,
+)
 from legal_rag.storage import RetrievalResult
 
 
@@ -139,6 +146,69 @@ def test_rag_service_streams_with_one_retrieval_and_preserves_sources() -> None:
     assert generator.stream_calls == [
         ("What governs contracts?", build_legal_context(sources))
     ]
-    assert list(result.chunks) == ["one", "two"]
+    assert list(result.chunks) == ["onetwo"]
     assert result.retrieved_sources == tuple(sources)
     assert retriever.calls == [("What governs contracts?", 2)]
+
+
+def test_service_records_authoritative_stream_usage_once() -> None:
+    class UsageGenerator(FakeGenerator):
+        def stream_generate_with_usage(
+            self, question: str, context: str
+        ) -> Iterator[GenerationChunk]:
+            self.stream_calls.append((question, context))
+            yield GenerationChunk("answer", LLMUsage(10, 1, 11))
+            yield GenerationChunk(" text", LLMUsage(10, 2, 12))
+
+    metrics = PrometheusMetrics(CollectorRegistry())
+    service = LegalRAGService(
+        FakeRetriever([_result(148, 0.9)]),
+        UsageGenerator(),
+        metrics=metrics,
+        provider="gemini",
+        input_cost_per_million_tokens_usd=1.0,
+        output_cost_per_million_tokens_usd=2.0,
+    )
+
+    result = service.stream_answer("question")
+
+    assert list(result.chunks) == ["answer ", "text"]
+    assert metrics.registry.get_sample_value(
+        "legal_rag_llm_tokens_total",
+        {"provider": "gemini", "token_type": "input", "mode": "stream"},
+    ) == pytest.approx(10)
+    assert metrics.registry.get_sample_value(
+        "legal_rag_llm_tokens_total",
+        {"provider": "gemini", "token_type": "output", "mode": "stream"},
+    ) == pytest.approx(2)
+
+
+def test_service_records_authoritative_full_usage_without_estimating_text() -> None:
+    class UsageGenerator(FakeGenerator):
+        def generate_with_usage(self, question: str, context: str) -> GenerationResult:
+            self.calls.append((question, context))
+            return GenerationResult("a very long answer", LLMUsage(total_tokens=7))
+
+    metrics = PrometheusMetrics(CollectorRegistry())
+    service = LegalRAGService(
+        FakeRetriever([_result(148, 0.9)]),
+        UsageGenerator(),
+        metrics=metrics,
+        provider="vllm",
+        input_cost_per_million_tokens_usd=100.0,
+        output_cost_per_million_tokens_usd=100.0,
+    )
+
+    service.answer("question")
+
+    assert metrics.registry.get_sample_value(
+        "legal_rag_llm_tokens_total",
+        {"provider": "vllm", "token_type": "total", "mode": "full"},
+    ) == pytest.approx(7)
+    assert (
+        metrics.registry.get_sample_value(
+            "legal_rag_llm_usage_cost_usd_total",
+            {"provider": "vllm", "mode": "full"},
+        )
+        is None
+    )
