@@ -44,7 +44,7 @@ class AppConfig:
     """Settings shared across the application."""
 
     app_name: str = "Arabic Legal RAG"
-    app_version: str = "0.1.0"
+    app_version: str = "0.4.0"
     environment: str = "development"
     log_level: str = "INFO"
     embedding_model: str = field(

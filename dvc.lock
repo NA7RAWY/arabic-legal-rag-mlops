@@ -13,8 +13,8 @@ stages:
       size: 1328272
     - path: src/legal_rag/config.py
       hash: md5
-      md5: d4c0cc3a7357f35fb0807fa8b32f8deb
-      size: 2412
+      md5: 9d33efda39d5e2f28d15b524dcaa7dbd
+      size: 4564
     - path: src/legal_rag/evaluation/dataset.py
       hash: md5
       md5: f72bf498a69e06c9a1bc9fba4828442e

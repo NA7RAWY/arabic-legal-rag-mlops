@@ -25,8 +25,10 @@ The mounted endpoints are:
 - `GET /health` — returns `status`, application name, and version.
 - `POST /ask` — accepts `question` and optional positive `top_k`, then returns the
   grounded answer and concise legal source metadata.
-- `POST /ask/stream` — accepts the same request, buffers and redacts the generated
-  answer, then emits source, sanitized-answer, and completion events using SSE.
+- `POST /ask/stream` — accepts the same request and uses the bounded incremental
+  `StreamingPIIRedactor`: proven-safe text is emitted progressively while only an
+  ambiguous suffix is retained to protect PII split across provider chunks. A
+  successful SSE response remains ordered `sources -> token(s) -> done`.
 
 Environment-based PostgreSQL and Gemini configuration is unchanged. No secrets
 are packaged in the service.

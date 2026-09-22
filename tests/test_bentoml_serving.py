@@ -76,7 +76,7 @@ def test_bentoml_health_contract_does_not_resolve_rag_dependency() -> None:
     assert response.json() == {
         "status": "ok",
         "app": "Arabic Legal RAG",
-        "version": "0.1.0",
+        "version": "0.4.0",
     }
 
 

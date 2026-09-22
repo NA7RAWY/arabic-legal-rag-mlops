@@ -94,7 +94,7 @@ def test_health_is_lightweight_and_does_not_initialize_rag_service() -> None:
     assert response.json() == {
         "status": "ok",
         "app": "Arabic Legal RAG",
-        "version": "0.1.0",
+        "version": "0.4.0",
     }
 
 
