@@ -1,0 +1,165 @@
+{
+  "evidence_type": "retrieval_top_k_comparison_50_case",
+  "experiment": {
+    "experiment_id": "1",
+    "experiment_name": "arabic-legal-rag-dev"
+  },
+  "exported_at_utc": "2026-09-29T13:07:23.237626+00:00",
+  "mlflow_client_version": "3.16.0",
+  "runs": [
+    {
+      "artifact_inventory": [
+        {
+          "path": "config/retrieval_config.json",
+          "size_bytes": 874
+        },
+        {
+          "path": "evaluation/comparison_summary.json",
+          "size_bytes": 376
+        },
+        {
+          "path": "evaluation/retrieval_report.json",
+          "size_bytes": 58357
+        }
+      ],
+      "metrics": {
+        "hit_rate_at_k": 0.94,
+        "mean_precision_at_k": 0.4,
+        "mean_recall_at_k": 0.7933333333333333,
+        "mrr": 0.8766666666666667
+      },
+      "parameters": {
+        "chunk_overlap": "0",
+        "chunk_size": "article_level_variable_length",
+        "chunk_strategy": "one_article_per_chunk",
+        "corpus_version": "sha256:ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+        "embedding_model": "intfloat/multilingual-e5-small",
+        "eval_cases": "50",
+        "eval_dataset": "legal-rag-eval-v1",
+        "eval_dataset_hash": "sha256:2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e",
+        "eval_dataset_sha256": "2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e",
+        "generator_model": "gemini-3.7-flash",
+        "prompt_version": "grounded-system-v1",
+        "retrieval_top_k": "3"
+      },
+      "run_id": "668d64e0615f4841aee69bc0b544c3d7",
+      "run_name": "retrieval-top-k-comparison-k3",
+      "run_purpose": "retrieval-top-k-comparison",
+      "status": "FINISHED",
+      "tags": {
+        "corpus_version": "sha256:ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+        "framework": "custom-rag",
+        "git_commit": "f7527bfe5cf3fa6b92410f49a368856930ded06e",
+        "git_dirty": "true",
+        "mlflow.runName": "retrieval-top-k-comparison-k3",
+        "project_type": "arabic-legal-rag",
+        "run_purpose": "retrieval-top-k-comparison"
+      }
+    },
+    {
+      "artifact_inventory": [
+        {
+          "path": "config/retrieval_config.json",
+          "size_bytes": 874
+        },
+        {
+          "path": "evaluation/comparison_summary.json",
+          "size_bytes": 376
+        },
+        {
+          "path": "evaluation/retrieval_report.json",
+          "size_bytes": 74424
+        }
+      ],
+      "metrics": {
+        "hit_rate_at_k": 0.94,
+        "mean_precision_at_k": 0.264,
+        "mean_recall_at_k": 0.8466666666666667,
+        "mrr": 0.8766666666666667
+      },
+      "parameters": {
+        "chunk_overlap": "0",
+        "chunk_size": "article_level_variable_length",
+        "chunk_strategy": "one_article_per_chunk",
+        "corpus_version": "sha256:ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+        "embedding_model": "intfloat/multilingual-e5-small",
+        "eval_cases": "50",
+        "eval_dataset": "legal-rag-eval-v1",
+        "eval_dataset_hash": "sha256:2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e",
+        "eval_dataset_sha256": "2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e",
+        "generator_model": "gemini-3.7-flash",
+        "prompt_version": "grounded-system-v1",
+        "retrieval_top_k": "5"
+      },
+      "run_id": "6f78cbf8082e4f7885db93cb73685307",
+      "run_name": "retrieval-top-k-comparison-k5",
+      "run_purpose": "retrieval-top-k-comparison",
+      "status": "FINISHED",
+      "tags": {
+        "corpus_version": "sha256:ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+        "framework": "custom-rag",
+        "git_commit": "f7527bfe5cf3fa6b92410f49a368856930ded06e",
+        "git_dirty": "true",
+        "mlflow.runName": "retrieval-top-k-comparison-k5",
+        "project_type": "arabic-legal-rag",
+        "run_purpose": "retrieval-top-k-comparison"
+      }
+    },
+    {
+      "artifact_inventory": [
+        {
+          "path": "config/retrieval_config.json",
+          "size_bytes": 874
+        },
+        {
+          "path": "evaluation/comparison_summary.json",
+          "size_bytes": 376
+        },
+        {
+          "path": "evaluation/retrieval_report.json",
+          "size_bytes": 99679
+        }
+      ],
+      "metrics": {
+        "hit_rate_at_k": 0.98,
+        "mean_precision_at_k": 0.18,
+        "mean_recall_at_k": 0.9033333333333333,
+        "mrr": 0.8825
+      },
+      "parameters": {
+        "chunk_overlap": "0",
+        "chunk_size": "article_level_variable_length",
+        "chunk_strategy": "one_article_per_chunk",
+        "corpus_version": "sha256:ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+        "embedding_model": "intfloat/multilingual-e5-small",
+        "eval_cases": "50",
+        "eval_dataset": "legal-rag-eval-v1",
+        "eval_dataset_hash": "sha256:2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e",
+        "eval_dataset_sha256": "2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e",
+        "generator_model": "gemini-3.7-flash",
+        "prompt_version": "grounded-system-v1",
+        "retrieval_top_k": "8"
+      },
+      "run_id": "f287be52101d4d17bd6db222a73bed47",
+      "run_name": "retrieval-top-k-comparison-k8",
+      "run_purpose": "retrieval-top-k-comparison",
+      "status": "FINISHED",
+      "tags": {
+        "corpus_version": "sha256:ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+        "framework": "custom-rag",
+        "git_commit": "f7527bfe5cf3fa6b92410f49a368856930ded06e",
+        "git_dirty": "true",
+        "mlflow.runName": "retrieval-top-k-comparison-k8",
+        "project_type": "arabic-legal-rag",
+        "run_purpose": "retrieval-top-k-comparison"
+      }
+    }
+  ],
+  "shared_provenance": {
+    "corpus_sha256": "ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+    "embedding_model": "intfloat/multilingual-e5-small",
+    "evaluation_case_count": 50,
+    "evaluation_dataset": "legal-rag-eval-v1",
+    "evaluation_dataset_sha256": "2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e"
+  }
+}

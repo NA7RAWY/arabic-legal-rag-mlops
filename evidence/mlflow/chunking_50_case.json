@@ -1,0 +1,134 @@
+{
+  "evidence_type": "chunking_comparison_50_case",
+  "experiment": {
+    "experiment_id": "1",
+    "experiment_name": "arabic-legal-rag-dev"
+  },
+  "exported_at_utc": "2026-09-29T13:07:24.301174+00:00",
+  "mlflow_client_version": "3.16.0",
+  "runs": [
+    {
+      "artifact_inventory": [
+        {
+          "path": "analysis/corpus_lengths.json",
+          "size_bytes": 190
+        },
+        {
+          "path": "config/chunking.json",
+          "size_bytes": 879
+        },
+        {
+          "path": "evaluation/comparison_summary.json",
+          "size_bytes": 310
+        },
+        {
+          "path": "evaluation/retrieval_report.json",
+          "size_bytes": 74424
+        }
+      ],
+      "metrics": {
+        "articles_split": 0.0,
+        "hit_rate_at_k": 0.94,
+        "max_chunks_per_article": 1.0,
+        "mean_chunks_per_article": 1.0,
+        "mean_precision_at_k": 0.264,
+        "mean_recall_at_k": 0.8466666666666667,
+        "mrr": 0.8766666666666667,
+        "total_chunks": 1149.0
+      },
+      "parameters": {
+        "chunk_overlap": "0",
+        "chunk_size": "article_level_variable_length",
+        "chunk_strategy": "one_article_per_chunk",
+        "corpus_version": "sha256:ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+        "embedding_model": "intfloat/multilingual-e5-small",
+        "eval_cases": "50",
+        "eval_dataset": "legal-rag-eval-v1",
+        "eval_dataset_hash": "sha256:2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e",
+        "eval_dataset_sha256": "2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e",
+        "generator_model": "gemini-3.7-flash",
+        "prompt_version": "grounded-system-v1",
+        "retrieval_top_k": "5",
+        "split_threshold": "not_applicable"
+      },
+      "run_id": "1eb9eb5ae7bc42e5bfd4755d068c83ad",
+      "run_name": "chunking-comparison-one_article_per_chunk",
+      "run_purpose": "chunking-comparison",
+      "status": "FINISHED",
+      "tags": {
+        "corpus_version": "sha256:ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+        "framework": "custom-rag",
+        "git_commit": "f7527bfe5cf3fa6b92410f49a368856930ded06e",
+        "git_dirty": "true",
+        "mlflow.runName": "chunking-comparison-one_article_per_chunk",
+        "project_type": "arabic-legal-rag",
+        "run_purpose": "chunking-comparison"
+      }
+    },
+    {
+      "artifact_inventory": [
+        {
+          "path": "analysis/corpus_lengths.json",
+          "size_bytes": 190
+        },
+        {
+          "path": "config/chunking.json",
+          "size_bytes": 837
+        },
+        {
+          "path": "evaluation/comparison_summary.json",
+          "size_bytes": 310
+        },
+        {
+          "path": "evaluation/retrieval_report.json",
+          "size_bytes": 74497
+        }
+      ],
+      "metrics": {
+        "articles_split": 30.0,
+        "hit_rate_at_k": 0.94,
+        "max_chunks_per_article": 4.0,
+        "mean_chunks_per_article": 1.0278503046127068,
+        "mean_precision_at_k": 0.264,
+        "mean_recall_at_k": 0.8466666666666667,
+        "mrr": 0.8666666666666667,
+        "total_chunks": 1181.0
+      },
+      "parameters": {
+        "chunk_overlap": "75",
+        "chunk_size": "500",
+        "chunk_strategy": "split_long_articles",
+        "corpus_version": "sha256:ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+        "embedding_model": "intfloat/multilingual-e5-small",
+        "eval_cases": "50",
+        "eval_dataset": "legal-rag-eval-v1",
+        "eval_dataset_hash": "sha256:2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e",
+        "eval_dataset_sha256": "2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e",
+        "generator_model": "gemini-3.7-flash",
+        "prompt_version": "grounded-system-v1",
+        "retrieval_top_k": "5",
+        "split_threshold": "600"
+      },
+      "run_id": "0bd3e8b2564f4819a239606f3772f2e4",
+      "run_name": "chunking-comparison-split_long_articles",
+      "run_purpose": "chunking-comparison",
+      "status": "FINISHED",
+      "tags": {
+        "corpus_version": "sha256:ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+        "framework": "custom-rag",
+        "git_commit": "f7527bfe5cf3fa6b92410f49a368856930ded06e",
+        "git_dirty": "true",
+        "mlflow.runName": "chunking-comparison-split_long_articles",
+        "project_type": "arabic-legal-rag",
+        "run_purpose": "chunking-comparison"
+      }
+    }
+  ],
+  "shared_provenance": {
+    "corpus_sha256": "ab5ba8696d7f448d740ddcb7cb686491d72459fbc1f4a361ae628b19527f44e4",
+    "embedding_model": "intfloat/multilingual-e5-small",
+    "evaluation_case_count": 50,
+    "evaluation_dataset": "legal-rag-eval-v1",
+    "evaluation_dataset_sha256": "2f3a6f0bf1a31fd3bc5eed8f12e1212e1e2f1eea2db0a48e3fca079cf5d4da7e"
+  }
+}
