@@ -1,0 +1,7 @@
+[core]
+    remote = hf-storage
+['remote "hf-storage"']
+    url = s3://arabic-legal-rag-dvc/dvc-store
+    endpointurl = https://s3.hf.co/NA7RAWY
+    region = us-east-1
+    allow_anonymous_login = true
