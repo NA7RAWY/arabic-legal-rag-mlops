@@ -42,6 +42,8 @@ class LLMUsage:
     input_tokens: int | None = None
     output_tokens: int | None = None
     total_tokens: int | None = None
+    thinking_tokens: int | None = None
+    tool_tokens: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -76,6 +78,10 @@ def _gemini_usage(response: Any) -> LLMUsage | None:
         input_tokens=_usage_value(getattr(metadata, "prompt_token_count", None)),
         output_tokens=_usage_value(getattr(metadata, "candidates_token_count", None)),
         total_tokens=_usage_value(getattr(metadata, "total_token_count", None)),
+        thinking_tokens=_usage_value(getattr(metadata, "thoughts_token_count", None)),
+        tool_tokens=_usage_value(
+            getattr(metadata, "tool_use_prompt_token_count", None)
+        ),
     )
     return usage if _has_usage(usage) else None
 
@@ -95,7 +101,13 @@ def _openai_usage(payload: dict[str, Any]) -> LLMUsage | None:
 def _has_usage(usage: LLMUsage) -> bool:
     return any(
         value is not None
-        for value in (usage.input_tokens, usage.output_tokens, usage.total_tokens)
+        for value in (
+            usage.input_tokens,
+            usage.output_tokens,
+            usage.total_tokens,
+            usage.thinking_tokens,
+            usage.tool_tokens,
+        )
     )
 
 

@@ -192,26 +192,38 @@ class PrometheusMetrics:
         input_tokens: int | None = None,
         output_tokens: int | None = None,
         total_tokens: int | None = None,
+        thinking_tokens: int | None = None,
+        tool_tokens: int | None = None,
         input_cost_per_million_tokens_usd: float | None = None,
         output_cost_per_million_tokens_usd: float | None = None,
     ) -> None:
         """Record trustworthy provider-reported usage when adapters expose it."""
 
-        values = (input_tokens, output_tokens, total_tokens)
+        token_values = {
+            "input": input_tokens,
+            "output": output_tokens,
+            "total": total_tokens,
+            "thinking": thinking_tokens,
+            "tool": tool_tokens,
+        }
         if mode not in _RESPONSE_MODES or any(
             value is not None
             and (isinstance(value, bool) or not isinstance(value, int) or value < 0)
-            for value in values
+            for value in token_values.values()
         ):
             return
 
         def operation() -> None:
             label = _provider_label(provider)
-            for token_type, value in zip(
-                ("input", "output", "total"), values, strict=True
-            ):
+            for token_type, value in token_values.items():
                 if value is not None:
                     self.llm_tokens.labels(label, token_type, mode).inc(value)
+            known_component_total = (
+                (input_tokens or 0)
+                + (output_tokens or 0)
+                + (thinking_tokens or 0)
+                + (tool_tokens or 0)
+            )
             if (
                 input_tokens is not None
                 and output_tokens is not None
@@ -221,13 +233,16 @@ class PrometheusMetrics:
                 and isfinite(output_cost_per_million_tokens_usd)
                 and input_cost_per_million_tokens_usd >= 0
                 and output_cost_per_million_tokens_usd >= 0
-                and (
-                    total_tokens is None or total_tokens == input_tokens + output_tokens
-                )
+                # Gemini defines total as prompt + candidates + thoughts +
+                # tool-use prompt tokens. A mismatch means an authoritative
+                # billable component is still unavailable, so do not infer it.
+                and (total_tokens is None or total_tokens == known_component_total)
             ):
+                billable_input_tokens = input_tokens + (tool_tokens or 0)
+                billable_output_tokens = output_tokens + (thinking_tokens or 0)
                 cost = (
-                    input_tokens * input_cost_per_million_tokens_usd
-                    + output_tokens * output_cost_per_million_tokens_usd
+                    billable_input_tokens * input_cost_per_million_tokens_usd
+                    + billable_output_tokens * output_cost_per_million_tokens_usd
                 ) / 1_000_000
                 self.llm_usage_cost_usd.labels(label, mode).inc(cost)
 

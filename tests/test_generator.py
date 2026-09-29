@@ -249,6 +249,8 @@ def test_gemini_usage_comes_only_from_official_response_metadata() -> None:
         prompt_token_count=21,
         candidates_token_count=8,
         total_token_count=29,
+        thoughts_token_count=None,
+        tool_use_prompt_token_count=None,
     )
     generator = GeminiGenerator(api_key="test-key", client=FakeClient(models))
 
@@ -258,6 +260,27 @@ def test_gemini_usage_comes_only_from_official_response_metadata() -> None:
     assert result.usage.input_tokens == 21
     assert result.usage.output_tokens == 8
     assert result.usage.total_tokens == 29
+    assert result.usage.thinking_tokens is None
+    assert result.usage.tool_tokens is None
+
+
+def test_gemini_thinking_and_tool_usage_comes_from_official_metadata() -> None:
+    models = FakeModels()
+    models.usage_metadata = SimpleNamespace(
+        prompt_token_count=21,
+        candidates_token_count=8,
+        thoughts_token_count=5,
+        tool_use_prompt_token_count=3,
+        total_token_count=37,
+    )
+    generator = GeminiGenerator(api_key="test-key", client=FakeClient(models))
+
+    usage = generator.generate_with_usage("question", "context").usage
+
+    assert usage is not None
+    assert usage.thinking_tokens == 5
+    assert usage.tool_tokens == 3
+    assert usage.total_tokens == 37
 
 
 def test_gemini_missing_usage_remains_unknown() -> None:

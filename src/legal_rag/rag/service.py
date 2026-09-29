@@ -119,6 +119,8 @@ class LegalRAGService:
             input_tokens=usage.input_tokens,
             output_tokens=usage.output_tokens,
             total_tokens=usage.total_tokens,
+            thinking_tokens=usage.thinking_tokens,
+            tool_tokens=usage.tool_tokens,
             input_cost_per_million_tokens_usd=(self.input_cost_per_million_tokens_usd),
             output_cost_per_million_tokens_usd=(
                 self.output_cost_per_million_tokens_usd

@@ -257,6 +257,29 @@ def test_missing_pricing_does_not_emit_a_cost_sample() -> None:
     )
 
 
+@pytest.mark.parametrize("invalid_rate", [-1.0, float("nan")])
+def test_invalid_pricing_does_not_emit_a_cost_sample(invalid_rate: float) -> None:
+    metrics = _metrics()
+
+    metrics.record_token_usage(
+        "gemini",
+        mode="full",
+        input_tokens=10,
+        output_tokens=5,
+        total_tokens=15,
+        input_cost_per_million_tokens_usd=invalid_rate,
+        output_cost_per_million_tokens_usd=2.0,
+    )
+
+    assert (
+        metrics.registry.get_sample_value(
+            "legal_rag_llm_usage_cost_usd_total",
+            {"provider": "gemini", "mode": "full"},
+        )
+        is None
+    )
+
+
 def test_unclassified_provider_tokens_do_not_emit_partial_cost() -> None:
     metrics = _metrics()
 
@@ -277,3 +300,32 @@ def test_unclassified_provider_tokens_do_not_emit_partial_cost() -> None:
         )
         is None
     )
+
+
+def test_gemini_thinking_and_tool_tokens_are_priced_by_authoritative_category() -> None:
+    metrics = _metrics()
+
+    metrics.record_token_usage(
+        "gemini",
+        mode="full",
+        input_tokens=732,
+        output_tokens=71,
+        thinking_tokens=306,
+        tool_tokens=3,
+        total_tokens=1112,
+        input_cost_per_million_tokens_usd=1.0,
+        output_cost_per_million_tokens_usd=2.0,
+    )
+
+    assert metrics.registry.get_sample_value(
+        "legal_rag_llm_tokens_total",
+        {"provider": "gemini", "token_type": "thinking", "mode": "full"},
+    ) == pytest.approx(306)
+    assert metrics.registry.get_sample_value(
+        "legal_rag_llm_tokens_total",
+        {"provider": "gemini", "token_type": "tool", "mode": "full"},
+    ) == pytest.approx(3)
+    assert metrics.registry.get_sample_value(
+        "legal_rag_llm_usage_cost_usd_total",
+        {"provider": "gemini", "mode": "full"},
+    ) == pytest.approx(((732 + 3) * 1.0 + (71 + 306) * 2.0) / 1_000_000)
