@@ -31,8 +31,10 @@ Egyptian Civil Code JSON (DVC)
 - Module 3: Airflow orchestration, BentoML, optional vLLM, HTTP/SSE streaming,
   Locust scenarios, bounded provider retries, canary release, and Docker Hub
   publishing automation.
-- Module 4 in progress: Prometheus/Grafana metrics, offline query-embedding
-  drift, and privacy-conscious Langfuse request tracing.
+- Module 4: Prometheus metrics, a provisioned Grafana dashboard,
+  privacy-conscious Langfuse tracing, offline query-embedding drift, PII
+  redaction, authoritative provider token accounting, and configurable USD
+  cost accounting.
 
 The production defaults remain one legal article per chunk and `top_k=5`.
 Gemini remains the default generator; vLLM is an optional OpenAI-compatible
@@ -57,6 +59,8 @@ serving/              isolated BentoML dependency
 loadtest/             controlled target and Locust scenarios
 release/              BentoML image, nginx canary, rollback configuration
 docs/                 focused serving, streaming, load, and release guides
+monitoring/           Prometheus configuration and provisioned Grafana dashboard
+evidence/             durable exports of verified experiment results
 tests/                unit, API, orchestration, and static configuration tests
 .github/workflows/    CI quality gates and Docker Hub publishing
 ```
@@ -99,12 +103,19 @@ The canonical corpus and 50-case evaluation dataset are DVC-managed:
 
 ```bash
 dvc status
+dvc pull            # currently requires local S3 credentials; see below
 dvc checkout        # restore from an existing local DVC cache
 dvc repro           # run deterministic dataset validation/summary
 ```
 
-No durable shared DVC remote is configured. Consequently `dvc pull` and full
-fresh-clone reproduction require a remote to be configured later.
+The configured default remote is `hf-storage`, backed by
+`s3://arabic-legal-rag-dvc/dvc-store` through the Hugging Face S3-compatible
+endpoint `https://s3.hf.co/NA7RAWY`. The canonical corpus and 50-case evaluation
+dataset are synchronized to that bucket. Although the bucket is public, a tested
+anonymous fresh-clone `dvc pull` currently receives HTTP 403 from the
+S3-compatible endpoint. DVC pull therefore currently requires Hugging Face
+S3 credentials kept only in local DVC configuration, the environment, or a
+secret store. Never commit those credentials.
 
 Start only the local stateful services:
 
@@ -179,25 +190,52 @@ Source records are preserved. This is targeted pattern protection, not a claim
 of universal PII detection; details and monitoring behavior are in [the
 monitoring guide](docs/monitoring.md).
 
-Prometheus records authoritative provider token metadata when it is returned;
-optional cost/hour requires explicit per-million-token USD rates and is never
-guessed from the model name or answer text. Metric names, timing boundaries, and
-safe labels are documented in
-[the monitoring guide](docs/monitoring.md).
+## Monitoring and observability
+
+Start the application and local monitoring services, then inspect their
+endpoints:
+
+```bash
+docker compose up -d prometheus grafana
+curl http://127.0.0.1:8000/metrics
+```
+
+- Prometheus: `http://localhost:9090`
+- Prometheus targets: `http://localhost:9090/targets`
+- Grafana and its provisioned Legal RAG dashboard: `http://localhost:3001`
+
+Prometheus covers HTTP traffic and errors, retrieval/generation latency, source
+counts, provider failures, PII redactions, drift, tokens, and configured usage
+cost. Labels are bounded and never include questions, answers, or legal text.
 
 Langfuse tracing is disabled by default. When explicitly enabled and configured,
-each full or streaming RAG execution records a `legal-rag-request` chain with
-`retrieval` and `generation` children. Question text, generated answers, and
-retrieved legal text are not captured. Langfuse Cloud or a compatible URL may be
-used; the project does not run Langfuse's heavy self-hosted infrastructure in
-the local Compose stack. See [the monitoring guide](docs/monitoring.md).
+each full or streaming request records one hierarchy:
 
-For local dashboards, start `prometheus` and `grafana` from Compose after binding
-the host FastAPI service to `0.0.0.0:8000`. Prometheus is available on port 9090;
-Grafana and its provisioned Legal RAG dashboard are available on port 3001.
+```text
+legal-rag-request
+  -> retrieval
+  -> generation
+```
+
+Question text, generated answer text, and retrieved legal text are not captured.
+Tracing is fail-open and uses Langfuse Cloud or another compatible URL; the local
+Compose stack does not self-host Langfuse.
+
+Provider usage is recorded only from authoritative response metadata. Gemini
+accounting preserves prompt/input tokens, visible candidate output, thinking
+tokens, tool-use prompt tokens, and authoritative total usage when reported.
+USD cost uses the explicitly configured input/output per-million-token rates;
+it is never inferred from text or model names. Thinking tokens use the configured
+output rate and tool-use prompt tokens use the configured input rate. Missing or
+unreconciled authoritative usage produces no fabricated cost.
+
+The always-on output guardrail redacts email addresses, Egyptian mobile numbers,
+and structurally valid Egyptian national IDs from `/ask` and `/ask/stream`.
+Streaming uses a bounded suffix buffer so cross-chunk PII is protected without
+turning the endpoint into full-response buffering.
 
 Inspect the frozen 50-question query-embedding reference or compare an offline
-JSON/JSONL query batch without PostgreSQL or an LLM provider:
+JSON/JSONL query batch without PostgreSQL, Gemini, or vLLM:
 
 ```bash
 python -m legal_rag.monitoring.drift
@@ -207,6 +245,27 @@ python -m legal_rag.monitoring.drift --input current_queries.json
 This cosine-to-reference-centroid signal detects query-distribution change, not
 answer correctness. Optional thresholds are operational policy, not validated
 quality boundaries; see [the monitoring guide](docs/monitoring.md).
+
+## Evidence and validated results
+
+Durable exports from the verified 50-case MLflow experiments are available in:
+
+- [`evidence/mlflow/retrieval_top_k_50_case.json`](evidence/mlflow/retrieval_top_k_50_case.json)
+- [`evidence/mlflow/chunking_50_case.json`](evidence/mlflow/chunking_50_case.json)
+
+Verified retrieval hit rates were `0.94` at `top_k=3`, `0.94` at `top_k=5`,
+and `0.98` at `top_k=8`. The production default remains `top_k=5` as the
+operational precision/recall and context-size compromise; the evidence exports
+retain full-precision metrics, run IDs, parameters, hashes, and artifact
+inventories. The chunking comparison supports retaining one legal article per
+chunk as the production baseline.
+
+The Airflow DAG structure, Prometheus scrape target, provisioned Grafana
+dashboard, and Langfuse `legal-rag-request -> retrieval -> generation` hierarchy
+have been manually smoke-verified. Authoritative Gemini token and configured
+cost telemetry has also been live-verified, including thinking-token usage.
+These observations are engineering evidence, not a claim of full production
+readiness.
 
 ## Optional vLLM backend
 
@@ -295,6 +354,20 @@ only a report with all 50 cases successfully scored is evidence of a completed
 benchmark. See [the monitoring guide](docs/monitoring.md) for call structure,
 failure semantics, and `--no-mlflow` usage.
 
+Retrieval and grounded-generation integration is implemented, but attempts to
+complete live RAGAS judging were blocked by external Gemini 503/high-demand
+responses. No completed 50-case aggregate RAGAS scores are claimed or
+fabricated.
+
+## Course-scope optimization note
+
+The hardware-dependent Session 5 optimization work—representative 7B GPU/vLLM
+throughput benchmarking, AWQ/quantization, or distillation—was waived by the
+course instructor for hardware-constrained machines. The current local hardware
+is not suitable for a representative 7B GPU benchmark, so no optimization
+benchmark is claimed. This is an explicit course-scope constraint rather than
+unfinished core RAG functionality.
+
 ## Canary release and rollback
 
 The local canary runs stable and candidate BentoML containers behind nginx with
@@ -344,20 +417,21 @@ git diff --check
 ```
 
 Tests use fakes/mocks for external services. Data-dependent integration tests are
-skipped on fresh CI runners until a DVC remote can restore canonical outputs.
+skipped on fresh CI runners unless the credentialed DVC workflow restores the
+canonical outputs.
 
 ## Known limitations
 
-- No durable shared DVC remote; fresh-clone corpus restoration is incomplete.
+- The durable Hugging Face DVC remote is configured and synchronized, but
+  anonymous fresh-clone pull currently returns HTTP 403; reviewers need local,
+  uncommitted S3 credentials for `dvc pull`.
 - Module 0 extraction still depends on availability of its source input; the
   normalized canonical corpus and audit artifacts are versioned separately.
-- Live RAGAS scoring depends on Gemini judge availability and quota; no missing
-  metric values are fabricated.
-- The complete 50-case RAGAS report and live token/cost samples are currently
-  provider-blocked by repeated Gemini 503/429 responses. The infrastructure and
-  mocked metadata paths are tested, but no scores or usage evidence are claimed.
+- Live RAGAS judging remains blocked by external Gemini 503/high-demand
+  responses; no aggregate RAGAS scores are claimed or fabricated.
 - Gemini is an external network/quota dependency despite bounded 429/5xx retries.
-- Current local hardware cannot represent production 7B vLLM throughput.
+- Instructor-waived optimization and the current local hardware cannot represent
+  production 7B GPU/vLLM throughput, quantization, or distillation benchmarks.
 - The single-machine nginx canary has one failure domain and no automated
   metric-driven promotion.
 - No authentication, authorization, rate limiting, request persistence, or
