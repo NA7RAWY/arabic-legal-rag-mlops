@@ -246,7 +246,7 @@ This cosine-to-reference-centroid signal detects query-distribution change, not
 answer correctness. Optional thresholds are operational policy, not validated
 quality boundaries; see [the monitoring guide](docs/monitoring.md).
 
-## Evidence and validated results
+## Project Evidence
 
 Durable exports from the verified 50-case MLflow experiments are available in:
 
@@ -260,12 +260,55 @@ retain full-precision metrics, run IDs, parameters, hashes, and artifact
 inventories. The chunking comparison supports retaining one legal article per
 chunk as the production baseline.
 
+### MLflow experiment tracking
+
+![MLflow retrieval metrics for the controlled top-k runs](docs/images/evidence/mlflow-retrieval-results.png)
+
+*Recorded hit rate, precision, recall, and MRR for the controlled `top_k=3`, `5`,
+and `8` retrieval runs.*
+
+![MLflow comparison of retrieval top-k configurations](docs/images/evidence/mlflow-retrieval-comparison.png)
+
+*Side-by-side experiment comparison used to retain `top_k=5` as the operational
+default without automatically changing production behavior.*
+
+### Airflow orchestration
+
+![Airflow Legal RAG maintenance and evaluation pipeline](docs/images/evidence/airflow-rag-pipeline.png)
+
+*The manual DAG coordinates `validate_corpus -> validate_evaluation_dataset ->
+rebuild_vector_index -> run_retrieval_evaluation -> run_rag_evaluation`. The
+provider-dependent RAG task remains safety-gated; this is not evidence of a
+completed live RAGAS benchmark.*
+
+### Grafana observability
+
+![Grafana API traffic and latency observability dashboard](docs/images/evidence/grafana-api-observability.png)
+
+*The dashboard shows API traffic and request rates, HTTP errors, p95 HTTP
+latency, p95 retrieval latency, and p95 generation latency.*
+
+![Grafana LLM provider token and cost observability dashboard](docs/images/evidence/grafana-llm-observability.png)
+
+*The dashboard shows retrieved-source counts, LLM provider failures, process
+CPU/memory, authoritative token usage, and LLM cost telemetry calculated only
+from configured rates. These are local validation evidence, not production-scale
+traffic or a production-readiness claim.*
+
+### Langfuse tracing
+
+![Langfuse trace showing the Legal RAG request hierarchy](docs/images/evidence/langfuse-rag-trace.png)
+
+*The trace demonstrates `legal-rag-request -> retrieval -> generation`, including
+generation model and timing metadata. Prompt, response, and retrieved-text
+payloads are intentionally absent, minimizing sensitive application text sent to
+observability rather than asserting a universal privacy guarantee.*
+
 The Airflow DAG structure, Prometheus scrape target, provisioned Grafana
-dashboard, and Langfuse `legal-rag-request -> retrieval -> generation` hierarchy
-have been manually smoke-verified. Authoritative Gemini token and configured
-cost telemetry has also been live-verified, including thinking-token usage.
-These observations are engineering evidence, not a claim of full production
-readiness.
+dashboard, and Langfuse trace hierarchy have been manually smoke-verified.
+Authoritative Gemini token and configured cost telemetry has also been
+live-verified, including thinking-token usage. These observations are engineering
+evidence, not a claim of full production readiness.
 
 ## Optional vLLM backend
 
